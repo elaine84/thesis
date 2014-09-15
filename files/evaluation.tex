@@ -1,8 +1,13 @@
 \documentclass[angelino.tex]{subfiles} 
 
-\newcommand{\fdir}{/Users/elaine/Dropbox/nips12-mcmc/consolidate/mixture-thesis}
+\newcommand{\bdir}{figs/blasso}
+% See also: /Users/elaine/Dropbox/nips12-mcmc/consolidate/blasso
 
-\newcommand{\gdir}{/Users/elaine/Dropbox/nips12-mcmc/consolidate/20140310}
+\newcommand{\fdir}{figs/mixture-thesis}
+% See also: /Users/elaine/Dropbox/nips12-mcmc/consolidate/mixture-thesis
+
+\newcommand{\gdir}{figs/20140310}
+% See also: /Users/elaine/Dropbox/nips12-mcmc/consolidate/20140310
 
 \begin{document}
 
@@ -448,9 +453,9 @@ Also note that speedup does not necessarily decrease steadily, or even monotonic
 \begin{figure}[t!]
 \centering
 \vspace{-0.3in}
-\includegraphics[width=0.56\textwidth]{figs/blasso-0_1-speedup-depth.pdf}
-\includegraphics[width=0.56\textwidth]{figs/blasso-0_01-speedup-depth.pdf}
-\includegraphics[width=0.56\textwidth]{figs/blasso-0_1-2-speedup-depth.pdf}
+\includegraphics[width=0.56\textwidth]{figs/blasso/blasso-0_1-speedup-depth.pdf}
+\includegraphics[width=0.56\textwidth]{figs/blasso/blasso-0_01-speedup-depth.pdf}
+\includegraphics[width=0.56\textwidth]{figs/blasso/blasso-0_1-2-speedup-depth.pdf}
 \caption{Cumulative speedup relative to our baseline,
 as a function of the number of MH iterations, for the Bayesian Lasso problem.
 The different curves correspond to different numbers of workers.
