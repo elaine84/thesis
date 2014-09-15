@@ -1,0 +1,148 @@
+\documentclass{article}
+\usepackage{msc}
+\begin{document}
+
+\def\WANTWORK{\texttt{WANT-WORK}}
+\def\HAVEWORK{\texttt{HAVE-WORK}}
+\def\SETPROPOSAL{\texttt{SET-PROPOSAL}}
+\def\UPDATE{\texttt{UPDATE}}
+\def\ABANDON{\texttt{ABANDON}}
+\def\DONE{\texttt{DONE}}
+
+\begin{msc}{Protocol}
+	\setlength{\instdist}{2.8\instdist}
+	\declinst{m}{}{Master}
+	\declinst{w}{}{Worker}
+
+	\mess{\WANTWORK}{w}{m}[1]
+	\msccomment[r]{(A)}{w}
+	\nextlevel
+	\msccomment[l]{(B)}{m}
+	\nextlevel
+	\mess{\HAVEWORK}{m}{w}[1]
+	\nextlevel
+	\msccomment[r]{(C)}{w}
+	\nextlevel
+	\mess{\SETPROPOSAL}{w}{m}[1]
+	\nextlevel
+	\msccomment[l]{(D)}{m}
+	\msccomment[r]{(E)}{w}
+	\nextlevel
+	\mess{\UPDATE}{w}{m}[1]
+	\nextlevel
+	\msccomment[l]{(F)}{m}
+	\nextlevel
+	\mess{\UPDATE}{w}{m}[1]
+	\nextlevel
+	\nextlevel
+	\msccomment[l]{(G)}{m}
+	\mess{\textcolor{blue}{\ABANDON}}{m}{w}[1]
+	\nextlevel
+	\msccomment[r]{(H)}{w}
+	\nextlevel
+	\mess{\textcolor{blue}{\WANTWORK}}{w}{m}[1]
+	\nextlevel
+	\nextlevel
+	\mess{\UPDATE}{w}{m}[1]
+	\nextlevel
+	\nextlevel
+	\msccomment[r]{(I)}{w}
+	\mess{\DONE}{w}{m}[1]
+	\nextlevel
+	\msccomment[l]{(J)}{m}
+	\nextlevel
+	\msccomment[r]{(K)}{w}
+	\mess{\WANTWORK}{w}{m}[1]
+	\nextlevel
+\end{msc}
+
+
+\begin{msc}{new work, no abandons}
+	\setlength{\instdist}{2.8\instdist}
+	\declinst{m}{}{Master}
+	\declinst{w}{}{Worker}
+
+	\mess{\WANTWORK}{w}{m}[1]
+	%\msccomment[r]{(A)}{w}
+	\nextlevel
+	%\msccomment[l]{(B)}{m}
+	\nextlevel
+	\mess{New \HAVEWORK}{m}{w}[1]
+	\nextlevel
+	%\msccomment[r]{(C)}{w}
+	\nextlevel
+	\mess{\SETPROPOSAL}{w}{m}[1]
+	\nextlevel
+	%\msccomment[l]{(D)}{m}
+	%\msccomment[r]{(E)}{w}
+	\nextlevel
+	\mess{\UPDATE}{w}{m}[1]
+	\nextlevel
+	%\msccomment[l]{(F)}{m}
+	\nextlevel
+	\mess{\UPDATE}{w}{m}[1]
+	\nextlevel
+	\nextlevel
+	\mess{Last \UPDATE}{w}{m}[1]
+	\nextlevel
+	%\msccomment[l]{(J)}{m}
+	\nextlevel
+	%\msccomment[r]{(K)}{w}
+	\mess{\WANTWORK}{w}{m}[1]
+	\nextlevel
+\end{msc}
+
+
+\begin{msc}{partial work, no abandon}
+	\setlength{\instdist}{2.8\instdist}
+	\declinst{m}{}{Master}
+	\declinst{w}{}{Worker}
+
+	\mess{\WANTWORK}{w}{m}[1]
+	%\msccomment[r]{(A)}{w}
+	\nextlevel
+	%\msccomment[l]{(B)}{m}
+	\nextlevel
+	\mess{Partial \HAVEWORK}{m}{w}[1]
+	\nextlevel
+	%\msccomment[r]{(C)}{w}
+	\nextlevel
+	\mess{\UPDATE}{w}{m}[1]
+	\nextlevel
+	%\msccomment[l]{(F)}{m}
+	\nextlevel
+	\mess{Last \UPDATE}{w}{m}[1]
+	\nextlevel
+	\nextlevel
+	%\msccomment[r]{(K)}{w}
+	\mess{\WANTWORK}{w}{m}[1]
+	\nextlevel
+\end{msc}
+
+\begin{msc}{partial work, abandon}
+	\setlength{\instdist}{2.8\instdist}
+	\declinst{m}{}{Master}
+	\declinst{w}{}{Worker}
+
+	\mess{\WANTWORK}{w}{m}[1]
+	%\msccomment[r]{(A)}{w}
+	\nextlevel
+	%\msccomment[l]{(B)}{m}
+	\nextlevel
+	\mess{Partial \HAVEWORK}{m}{w}[1]
+	\nextlevel
+	%\msccomment[r]{(C)}{w}
+	\nextlevel
+	\mess{\UPDATE}{w}{m}[1]
+	\nextlevel
+	%\msccomment[l]{(F)}{m}
+	\nextlevel
+	\mess{\ABANDON}{m}{w}[1]
+	\nextlevel
+	%\msccomment[r]{(H)}{w}
+	\nextlevel
+	\mess{\WANTWORK}{w}{m}[1]
+	\nextlevel
+\end{msc}
+
+\end{document}

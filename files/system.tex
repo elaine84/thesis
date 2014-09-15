@@ -445,7 +445,7 @@ respond to a message from a worker, and always returns to the \wait state.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.49\textwidth]{figs/new-work.pdf}
+\includegraphics[width=0.49\textwidth]{figs/protocol/new-work.pdf}
 \caption{Simplest scenario in which a worker asks for work via a \WANTWORK
 message and receives a new \HAVEWORK message for a particular node in the jobtree.
 The worker performs all the work at this node, sending partial results along the way.
@@ -549,7 +549,7 @@ it sends the master a \WANTWORK message.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.49\textwidth]{figs/partial-work.pdf}
+\includegraphics[width=0.49\textwidth]{figs/protocol/partial-work.pdf}
 \caption{Scenario in which a worker receives a partial \HAVEWORK message
 for node~$\rho$ that already contains the state~$\theta_\rho$,
 and potentially, additional partial results.}
@@ -558,7 +558,7 @@ and potentially, additional partial results.}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.49\textwidth]{figs/new-work-abandon.pdf}
+\includegraphics[width=0.49\textwidth]{figs/protocol/new-work-abandon.pdf}
 \caption{Scenario in which a worker receives an \ABANDON message.
 If an \UPDATE from a worker results in the expected utility of the node dropping
 below some threshold, then the master sends an \ABANDON message.}
