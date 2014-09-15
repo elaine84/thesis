@@ -1,19 +1,97 @@
-\newcommand{\eanote}[1]{{\color{red} (EA) #1}}
+\newcommand{\eanote}[1]{{\todo{\footnotesize{\singlespacing #1}}}}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\yellow}[1]{{\color{yellow} #1}}
+\newcommand{\green}[1]{{\color{green} #1}}
 \newcommand{\eat}[1]{ }
 
 \def\ie{{\it i.e.},~}
 \def\eg{{\it e.g.},~}
 \def\etal{{\it et al.}~}
 
-\def\E{\mathbb{E}}
+\def\E{\mbox{E}}
+\def\P{\mathbb{P}}
+\def\Var{\mbox{Var}}
+\def\Unif{\mbox{Unif}}
+\def\Normal{\mbox{Normal}}
 \def\reals{\mathbb{R}}
-\def\one{\mathds{1}}
+\def\ints{\mathbb{Z}}
+%\def\one{\mathds{1}}
+\def\one{\mathbf{1}}
 \def\Normal{\mathrm{Normal}}
 \def\X{{\mathcal X}}
+\def\Y{{\mathcal Y}}
+\def\D{{\mathcal D}}
+\def\N{{\mathcal N}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\y}{\mathbf{y}}
+\newcommand{\bbeta}{\mathbf{\beta}}
+\newcommand{\uu}{\mathbf{u}}
+\newcommand{\s}{\mathbf{s}}
 
-\newtheorem{lemma}{Lemma}
-\newtheorem{theorem}{Theorem}
-\newtheorem{remark}{Remark}
-\newtheorem{definition}{Definition}
-\newtheorem{proposition}{Proposition}
-\newtheorem{claim}{Claim}
+\newcommand{\eins}{\mbox{$1 \hspace{-1.0mm} {\bf l}$}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\Ac}{\mathcal{A}^c}
+\newcommand{\T}[3]{T_{#1}(#2 \leftarrow #3)}
+
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{remark}{Remark}
+%\newtheorem{definition}{Definition}
+%\newtheorem{proposition}{Proposition}
+%\newtheorem{claim}{Claim}
+
+\newcommand{\noi}{\noindent}
+\newcommand{\nn}{\nonumber}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\erf}{\text{erf}}
+
+\newcommand{\given}{\,|\,}
+
+\newcommand{\mcL}{\mathcal{L}}
+\newcommand{\mcLD}{\mathcal{L}_\Delta}
+\newcommand{\mcP}{\mathcal{P}}
+\newcommand{\mcU}{\mathcal{U}}
+
+\newcommand{\Indicator}[1]{\iota_{#1}}
+\newcommand{\Predictor}[1]{\psi_{#1}}
+\newcommand{\PredEst}[2]{\psi_{#1}^{(#2)}}
+
+\newcommand{\bits}[1]{\texttt{#1}}
+\newcommand{\truncbits}[1]{{\lfloor#1\rfloor}}
+\let\bitstrunc\truncbits
+\newcommand{\xtruncbits}[1]{{\lfloor\!\lfloor#1\rfloor\!\rfloor}}
+\newcommand{\bitslen}[1]{{\text{length}(#1)}}
+\newcommand{\emptystr}{\epsilon}
+\newcommand{\superroot}{\ast}
+\newcommand{\defeatedby}{\prec}
+\newcommand{\bitsflip}[1]{{\text{flip}(#1)}}
+\newcommand{\sampapprox}[1]{\tilde #1}
+
+\newcommand{\node}{\texttt{JobNode}~}
+
+
+% messages
+\def\WANTWORK{\texttt{WANT-WORK}~}
+\def\HAVEWORK{\texttt{HAVE-WORK}~}
+\def\SETPROPOSAL{\texttt{SET-PROPOSAL}~}
+\def\UPDATE{\texttt{UPDATE}~}
+\def\ABANDON{\texttt{ABANDON}~}
+
+% master
+\def\wait{\texttt{wait}~}
+\def\schedule{\texttt{schedule}~}
+\def\setproposal{\texttt{add-proposal}~}
+\def\update{\texttt{update-tree}~}
+\def\emit{\texttt{emit}~}
+\def\sendabandon{\texttt{send-abandon}~}
+\def\deleteloser{\texttt{delete-loser}~}
+
+% worker
+\def\want{\texttt{want}~}
+\def\init{\texttt{start-work}~}
+\def\continue{\texttt{continue-work}~}
+\def\sendupdate{\texttt{send-update}~}
+\def\check{\texttt{check-abandon}~}

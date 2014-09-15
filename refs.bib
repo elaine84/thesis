@@ -1,6 +1,41 @@
+@article{metropolis-1953,
+	author = {Metropolis, Nicholas and Rosenbluth, Arianna W. and Rosenbluth,
+	          Marshall N. and Teller, Augusta H. and Teller, Edward},
+	journal = {The Journal of Chemical Physics},
+	number = {6},
+	pages = {1087-1092},
+	priority = {2},
+	publisher = {AIP},
+	title = {Equation of State Calculations by Fast Computing Machines},
+	volume = {21},
+	year = {1953}
+}
+
+@article{hastings-1970,
+    author = {Hastings, W. K.},
+    day = {01},
+    journal = {Biometrika},
+    month = apr,
+    number = {1},
+    pages = {97-109},
+    publisher = {Oxford University Press},
+    title = {Monte {C}arlo sampling methods using {M}arkov chains and their applications},
+    volume = {57},
+    year = {1970}
+}
+
+@article{roberts-1997-accept,
+    author = {Roberts, G. O. and Gelman, A. and Gilks, W. R.},
+    journal = {Annals of Applied Probability},
+    pages = {110--120},
+    title = {Weak convergence and optimal scaling of random walk {M}etropolis algorithms},
+    volume = {7},
+    year = {1997}
+}
+
 @article{witte-1991-SA,
 	author={Witte, E.E. and Chamberlain, R.D. and Franklin, M.A.}, 
-	journal={Parallel and Distributed Systems, IEEE Transactions on}, 
+	journal={IEEE Transactions on Parallel and Distributed Systems}, 
 	title={Parallel simulated annealing using speculative computation}, 
 	year={1991}, 
 	volume={2}, 
@@ -9,7 +44,6 @@
 }
 
 @article{brockwell-2006-prefetching,
-	jstor_articletype = {research-article},
 	title = {Parallel {M}arkov Chain {M}onte {C}arlo Simulation by Pre-Fetching},
 	author = {Brockwell, A. E.},
 	journal = {Journal of Computational and Graphical Statistics},
@@ -67,20 +101,16 @@
 
 @article{strid-2010-prefetching,
 	author = {Strid, Ingvar},
-	title = {Efficient parallelisation of Metropolis-Hastings algorithms using
-	         a prefetching approach},
-	journal = {Comput. Stat. Data Anal.},
+	title = {Efficient parallelisation of {M}etropolis-{H}astings algorithms
+	         using a prefetching approach},
+	journal = {Computational Statistics \& Data Analysis},
 	issue_date = {November, 2010},
 	volume = {54},
 	number = {11},
 	month = nov,
 	year = {2010},
-	issn = {0167-9473},
-	pages = {2814--2835},
+	pages = {2814-2835},
 	numpages = {22},
-	url = {http://dx.doi.org/10.1016/j.csda.2009.11.019},
-	doi = {10.1016/j.csda.2009.11.019},
-	acmid = {1814887},
 	publisher = {Elsevier Science Publishers B. V.},
 	address = {Amsterdam, The Netherlands, The Netherlands},
 }
@@ -103,10 +133,23 @@
 	year = {2012}
 }
 
+@phdthesis{murray-2007-thesis,
+	title = "Advances in {M}arkov chain {M}onte {C}arlo methods",
+	author = "Iain Murray",
+	year = "2007",
+	school = "Gatsby Computational Neuroscience Unit, University College London",
+}
+
+@book{tingley-2014-thesis,
+	title = "Towards the Quantum Machine: {U}sing Scalable Machine Learning Methods to Predict Photovoltaic Efficacy of Organic Molecules",
+	author = "Michael Tingley",
+	note = "Undergraduate thesis, Harvard College, 2014",
+}
+
 @article{christen-fox-2005-approx,
      jstor_articletype = {research-article},
-     title = {Markov Chain Monte Carlo Using an Approximation},
-     author = {Christen, J. Andrés and Fox, Colin},
+     title = {Markov Chain {M}onte {C}arlo Using an Approximation},
+     author = {Christen, J. Andr\'{e}s and Fox, Colin},
      journal = {Journal of Computational and Graphical Statistics},
      jstor_issuetitle = {},
      volume = {14},
@@ -114,6 +157,675 @@
      jstor_formatteddate = {Dec., 2005},
      pages = {795-810},
      year = {2005},
-     publisher = {American Statistical Association, Institute of Mathematical Statistics, and Interface Foundation of America},
-     copyright = {Copyright © 2005 American Statistical Association, Institute of Mathematical Statistics and Interface Foundation of America},
-    }
+     publisher = {American Statistical Association, Institute of Mathematical
+                  Statistics, and Interface Foundation of America},
+}
+
+@article{nishihara-2014-gess,
+  author  = {Robert Nishihara and Iain Murray and Ryan P. Adams},
+  title   = {Parallel {MCMC} with Generalized Elliptical Slice Sampling},
+  journal = {Journal of Machine Learning Research},
+  year    = {2014},
+  volume  = {15},
+  pages   = {2087-2112}
+}
+
+@article{diaconis-2008-revolution,
+    author = {Diaconis, Persi},
+    year = {2008},
+    journal = {Bulletin of the American Mathematical Society},
+    month = nov,
+    number = {2},
+    pages = {179--205},
+    title = {The {M}arkov chain {M}onte {C}arlo revolution}},
+    volume = {46}
+}
+
+@article{swendsen-1986-tempering,
+    author = {Swendsen, Robert H. and Wang, Jian S.},
+    day = {24},
+    journal = {Physical Review Letters},
+    month = nov,
+    number = {21},
+    pages = {2607--2609},
+    publisher = {American Physical Society},
+    title = {Replica {M}onte {C}arlo Simulation of Spin-Glasses},
+    volume = {57},
+    year = {1986}
+}
+
+@article{iba:2001-ensemble,
+author = {Yukito Iba},
+title = {Extended Ensemble {M}onte {C}arlo},
+journal = {International Journal of Modern Physics C},
+volume = {12},
+number = {05},
+pages = {623-656},
+year = {2001}
+}
+
+@article{goodman-2010-ensemble,
+	author = {Jonathan Goodman and Jonathan Weare},
+	title = {Ensemble samplers with affine invariance},
+	year = {2010},
+	volume = {5},
+	number = {1},
+	pages = {65-80},
+	journal = {Communications in Applied Mathematics and Computational Science}
+}
+
+@article{goodman-2012-emcee,
+	author="Daniel Foreman-Mackey and David W. Hogg and Dustin Lang and Jonathan Goodman",
+	title="{emcee}: The {MCMC} Hammer",
+	year="2012",
+	note = "Available at arXiv:1202.3665"
+}
+
+@article{duane:1987-hmc,
+  author = {Duane, Simon and Kennedy, A. D. and Pendleton, Brian J. and Roweth, Duncan},
+  journal = {Physics Letters B},
+  number = 2,
+  pages = {216--222},
+  title = {Hybrid {M}onte {C}arlo},
+  volume = 195,
+  year = 1987
+}
+
+@article{neal:2010-hmc,
+    author = {Neal, Radford M.},
+    journal = {Handbook of Markov Chain Monte Carlo},
+    pages = {113--162},
+    title = {{MCMC} Using {Hamiltonian} Dynamics},
+    volume = {54},
+    year = {2010}
+}
+
+@article{neal:2003-slice,
+  author = {Neal, Radford M.},
+  journal = {The Annals of Statistics},
+    year = "2003",
+     volume = "31",
+     pages = "705--767",
+  title = "Slice Sampling"
+}
+
+@article {kleiner-2013-bootstrap,
+author = {Kleiner, Ariel and Talwalkar, Ameet and Sarkar, Purnamrita and Jordan, Michael I.},
+title = {A scalable bootstrap for massive data},
+journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+issn = {1467-9868},
+year = {2014},
+}
+
+
+@article{conrad:2014-local,
+   author = {Patrick R. Conrad and Youssef M. Marzouk and Natesh S. Pillai and Aaron Smith},
+    title = {Asymptotically Exact {MCMC} Algorithms via Local Approximations of Computationally Intensive Models},
+  note = "Available at arXiv:1402.1694",
+archivePrefix = "arXiv",
+   eprint = {1402.1694},
+ primaryClass = "stat.ME",
+     year = 2014,
+    month = feb
+}
+
+@inproceedings{neiswanger-2013-ep,
+title = {Asymptotically Exact, Embarrassingly Parallel {MCMC}},
+author = {Willie Neiswanger and Chong Wang and Eric Xing},
+series = {UAI '14},
+booktitle = {30th Conference on Uncertainty in Artificial Intelligence},
+year = 2014,
+location = {Quebec City, Quebec, Canada}
+}
+
+@inproceedings{scott-2013-consensus,
+title = {Bayes and Big Data:  The Consensus {M}onte {C}arlo Algorithm},
+author  = {Steven L. Scott and Alexander W. Blocker and Fernando V. Bonassi},
+year  = 2013,
+booktitle = {Bayes 250}
+}
+
+@inproceedings{welling-2011-langevin,
+author = {Max Welling and Yee Whye Teh},
+booktitle = {Proceedings of the 28th International Conference on Machine Learning},
+series = {ICML '11},
+title = {{B}ayesian Learning via Stochastic Gradient {L}angevin Dynamics},
+Year = {2011}
+}
+
+@inproceedings{welling-2012-fisher,
+  author    = {Sungjin Ahn and Anoop Korattikara Balan and Max Welling},
+  title     = {Bayesian Posterior Sampling via Stochastic Gradient {F}isher Scoring},
+  booktitle = {Proceedings of the 29th International Conference on Machine Learning},
+  series = {ICML '12},
+  year      = {2012}
+}
+
+@inproceedings{korattikara-2014-austerity,
+author = {Korattikara, Anoop and Chen, Yutian and Welling, Max},
+booktitle = {Proceedings of the 31st International Conference on Machine Learning},
+series = {ICML '14},
+title = {Austerity in {MCMC} Land: {C}utting the {M}etropolis-{H}astings Budget},
+year = {2014}
+}
+
+@inproceedings{bardenet:2014-subsampling,
+author = {Bardenet, R\'{e}mi and Doucet, Arnaud and Holmes, Chris},
+booktitle = {Proceedings of the 31st International Conference on Machine Learning},
+series = {ICML '14},
+title = {Towards scaling up {M}arkov chain {M}onte {C}arlo: {A}n adaptive subsampling approach},
+year = {2014}
+}
+
+@article{doucet-2014-likelihood-estimator,
+    title={Efficient implementation of {M}arkov chain {M}onte {C}arlo when using an unbiased likelihood estimator},
+    author={Arnaud Doucet and Michael Pitt and Robert Kohn and George Deligiannidis},
+    note={Available at arXiv:1210.1871},
+    year={2014}
+}
+
+@inproceedings{maclaurin-2014-firefly,
+    author = {Maclaurin, Dougal and Adams, Ryan P.},
+	booktitle = {Proceedings of 30th Conference on Uncertainty in Artificial Intelligence},
+    title = {Firefly {M}onte {C}arlo: {E}xact {MCMC} with Subsets of Data},
+    year = {2014},
+    series = {UAI '14},
+    month = july
+}
+
+@book{optimization:1983-book,
+author="Dennis, J.E.jun. and Schnabel, Robert B.",
+title={Numerical methods for unconstrained optimization and nonlinear
+    equations},
+publisher="{Prentice-Hall Series in Computational Mathematics}",
+year="1983",
+reviewer="{O.Vaarmann}"
+}
+
+@book{murata:1998-statistical,
+    author = {Noboru Murata},
+    title = {A Statistical Study on On-line Learning},
+    year = {1998},
+    editor = {David Saad},
+    book = {Online Learning and Neural Networks},
+    publisher = {Cambridge University Press},
+    address = {Cambridge, UK}
+}
+
+@article{hoffman:2013-svi,
+ author = {Hoffman, Matthew D. and Blei, David M. and Wang, Chong and Paisley, John},
+ title = {Stochastic variational inference},
+ journal = {Journal of Machine Learning Research},
+ issue_date = {January 2013},
+ volume = {14},
+ number = {1},
+ month = may,
+ year = {2013},
+ pages = {1303--1347},
+ acmid = {2502622},
+ publisher = {JMLR.org},
+} 
+
+@Article{beaumont:2003-is,
+AUTHOR = {Beaumont, Mark A},
+TITLE = {Estimation of population growth or decline in genetically monitored populations.},
+JOURNAL = {Genetics},
+VOLUME = {164},
+YEAR = {2003},
+NUMBER = {3},
+PAGES = {1139-60},
+URL = {http://www.biomedsearch.com/nih/Estimation-population-growth-decline-in/12871921.html},
+PubMedID = {12871921},
+ISSN = {0016-6731},
+}
+
+@ARTICLE{andrieu:2009-pseudo,
+    author = {Christophe Andrieu and Gareth O. Roberts},
+    title = {The pseudo-marginal approach for efficient Monte Carlo computations},
+    journal = {Annals of Statistics},
+    year = {2009},
+    pages = {697--725}
+}
+
+@article{dunson:2013-weierstrass,
+    title={Parallel {MCMC} via {W}eierstrass Sampler},
+    author={Xiangyu Wang and David B. Dunson},
+    note={Available at arXiv:1312.4605},
+    year={2013}
+}
+
+@techreport{neal:2004-non-reversible,
+    author = {Neal, Radford M.},
+    institution = {University of Toronto},
+    number = {0406},
+    title = {Improving Asymptotic Variance of {MCMC} Estimators: {N}on-reversible Chains are Better},
+    year = {2004}
+}
+
+@article{diaconis:2000-non-reversible,
+ajournal = "Ann. Appl. Probab.",
+author = "Diaconis, Persi and Holmes, Susan and Neal, Radford M.",
+journal = "The Annals of Applied Probability",
+month = "08",
+number = "3",
+pages = "726--752",
+publisher = "The Institute of Mathematical Statistics",
+title = "Analysis of a non-reversible {M}arkov chain sampler",
+volume = "10",
+year = "2000"
+}
+
+@article{diaconis:2013-things,
+ajournal = "Bernoulli",
+author = "Diaconis, Persi",
+journal = "Bernoulli",
+month = "09",
+number = "4",
+pages = "1294--1305",
+publisher = "Bernoulli Society for Mathematical Statistics and Probability",
+title = "Some things we’ve learned (about {M}arkov chain {M}onte {C}arlo)",
+volume = "19",
+year = "2013"
+}
+
+@INPROCEEDINGS{geyer:2000-non-reversible,
+    author = {Charles J. Geyer and Antonietta Mira},
+    title = {On non-reversible {M}arkov chains},
+    booktitle = {Institute Communications, Volume 26: Monte Carlo Methods},
+    year = {2000},
+    pages = {93--108},
+    publisher = {American Mathematical Society}
+}
+
+@inproceedings{sun:2010-vortices,
+  author = {Sun, Yi and Gomez, Faustino J. and Schmidhuber, J\"{u}rgen},
+  booktitle = {Advances in Neural Information Processing Systems~23},
+  series = {NIPS~'10},
+  pages = {2235-2243},
+  title = {Improving the Asymptotic Performance of {M}arkov Chain {M}onte-{C}arlo by Inserting Vortices},
+  year = 2010
+}
+
+@article{turitsyn:2008-irreversible,
+author="Turitsyn, Konstantin S. and Chertkov, Michael and Vucelja, Marija",
+title="{Irreversible {M}onte {C}arlo algorithms for efficient sampling}",
+journal="Physica D ",
+volume="240",
+number="4-5",
+pages="410-414",
+year="2011",
+}
+
+@book{meyn-tweedie:1993,
+  address = {London},
+  author = {Meyn, Sean P. and Tweedie, Richard L.},
+  mrreviewer = {Esa Nummelin},
+  pages = {},
+  publisher = {Springer-Verlag London Ltd.},
+  series = {Communications and Control Engineering Series},
+  title = {Markov Chains and Stochastic Stability},
+  year = 1993
+}
+
+@book{gelman:1993-bda,
+    author = {Gelman, Andrew and Carlin, John B. and Stern, Hal S. and Rubin, Donald B.},
+    day = {29},
+    month = jul,
+    publisher = {Chapman and Hall/CRC},
+    title = {Bayesian Data Analysis, Second Edition},
+    year = {2003}
+}
+
+@article{von-Neumann:1951-random,
+  author =       "John von Neumann",
+  title =        "Various techniques used in connection with random digits",
+  journal =      "Journal of Research of the National Bureau of
+                 Standards. Applied Mathematics Series",
+  volume =       "12",
+  pages =        "36--38",
+  year =         "1951",
+  ajournal =     "J. Research Nat. Bur. Stand., Appl. Math. Series"
+}
+
+@ARTICLE{propp-wilson-1996a,
+    AUTHOR    = "James G. Propp and David B. Wilson",
+    TITLE     = "Exact sampling with coupled {M}arkov chains and applications
+                 to statistical mechanics",
+    JOURNAL   = "Random Structures and Algorithms",
+    VOLUME    = "9",
+    NUMBER    = "1\&2",
+    PAGES     = "223--252",
+    YEAR      = "1996"
+}
+
+@techreport{neal:2012a-permutation,
+  author = "Radford M. Neal",
+  title = "How to View an {MCMC} Simulation as a Permutation, with Applications to Parallel Simulation and Improved Importance Sampling",
+  number = "1201",
+  institution = "Dept. of Statistics, University of Toronto",
+  year = "2012"
+}
+
+@article{liu:2000-multiple-try,
+ _jstor_articletype = {research-article},
+ title = {The Multiple-Try Method and Local Optimization in {M}etropolis Sampling},
+ author = {Liu, Jun S. and Liang, Faming and Wong, Wing Hung},
+ journal = {Journal of the American Statistical Association},
+ _jstor_issuetitle = {},
+ volume = {95},
+ number = {449},
+ jstor_formatteddate = {Mar., 2000},
+ pages = {121-134},
+ _url = {http://www.jstor.org/stable/2669532},
+ _ISSN = {01621459},
+ _language = {English},
+ year = {2000},
+ _publisher = {American Statistical Association},
+ _copyright = {Copyright 2000 American Statistical Association},
+}
+
+@article{green:2001-delayed-rejection,
+     _jstor_articletype = {research-article},
+     title = {Delayed Rejection in Reversible Jump {M}etropolis-{H}astings},
+     author = {Green, Peter J. and Mira, Antonietta},
+     journal = {Biometrika},
+     _jstor_issuetitle = {},
+     volume = {88},
+     number = {4},
+     _jstor_formatteddate = {Dec., 2001},
+     pages = {pp. 1035-1053},
+     _url = {http://www.jstor.org/stable/2673700},
+     _ISSN = {00063444},
+     _language = {English},
+     year = {2001},
+     _publisher = {Biometrika Trust},
+     _copyright = {Copyright 2001 Biometrika Trust},
+}
+
+@article{tierney:1999-adaptive,
+   author = {Luke Tierney and Antonietta Mira},
+   title = {Some Adaptive {M}onte {C}arlo Methods for {B}ayesian Inference},
+   journal = {Statistics in Medicine},
+   year = {1999},
+   volume = {18},
+   pages = {2507--2515}
+}
+
+@article{haramoto:2008-jump-rng,
+ author = {Haramoto, Hiroshi and Matsumoto, Makoto and Nishimura, Takuji and Panneton, Fran\c{c}ois and L'Ecuyer, Pierre},
+ title = {Efficient Jump Ahead for {F2}-Linear Random Number Generators},
+ journal = {INFORMS J. on Computing},
+ issue_date = {Summer 2008},
+ volume = {20},
+ number = {3},
+ month = jul,
+ year = {2008},
+ pages = {385--390},
+ numpages = {6},
+  publisher = {INFORMS},
+ address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA}
+} 
+
+@inproceedings{haramoto:2008-jump-ahead,
+ author = {Haramoto, Hiroshi and Matsumoto, Makoto and L'Ecuyer, Pierre},
+ title = {A Fast Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space},
+ booktitle = {Proceedings of the 5th International Conference on Sequences and Their Applications},
+ series = {SETA '08},
+ year = {2008},
+ location = {Lexington, KY, USA},
+ pages = {290--298},
+ numpages = {9},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg}
+}
+
+@inproceedings{angelino:2014-prefetching,
+  author = {Elaine Angelino and Eddie Kohler and Amos Waterland and Margo Seltzer and Ryan P. Adams},
+  title = {Accelerating {MCMC} via parallel predictive prefetching},
+  series = {UAI '14},
+  booktitle = {30th Conference on Uncertainty in Artificial Intelligence},
+  year = 2014,
+  numpages = 10,
+  location = {Quebec City, Quebec, Canada}
+}
+
+@article{banterle-2014-delayed,
+    archivePrefix = {arXiv},
+    author = {Marco Banterle and Clara Grazian and Christian P. Robert},
+	archivePrefix = "arXiv", 
+    eprint = {1406.2660},
+    note = {Available at arXiv:1406.2660},
+    month = jun,
+    title = {Accelerating {M}etropolis-{H}astings algorithms: {D}elayed acceptance with prefetching},
+    year = {2014}
+}
+
+@article{tibshirani:1994-lasso,
+    author = {Robert Tibshirani},
+    title = {Regression Shrinkage and Selection Via the {L}asso},
+    journal = {Journal of the Royal Statistical Society, Series B},
+    year = {1994},
+    volume = {58},
+    pages = {267--288}
+}
+
+@article{park:2008-blasso,
+  author = {Park, Trevor and Casella, George},
+  title = {The {B}ayesian {L}asso},
+  journal = {Journal of the American Statistical Association},
+  volume = {103},
+  number = {482},
+  pages = {681-686},
+  year = {2008}
+}
+
+@article{cep-2011-hachmann,
+  title={{The Harvard Clean Energy Project: Large-scale computational screening and design of organic photovoltaics on the world community grid}},
+  author={Hachmann, Johannes and Olivares-Amaya, Roberto and Atahan-Evrenk, Sule and Amador-Bedolla, Carlos and S{\'a}nchez-Carrera, Roel S and Gold-Parker, Aryeh and Vogt, Leslie and Brockway, Anna M and Aspuru-Guzik, Al{\'a}n},
+  journal={The Journal of Physical Chemistry Letters},
+  volume={2},
+  number={17},
+  pages={2241--2251},
+  year={2011},
+  publisher={ACS Publications}
+}
+
+@article{cep-2014-hachmann,
+author ="Hachmann, Johannes and Olivares-Amaya, Roberto and Jinich, Adrian and Appleton, Anthony L. and Blood-Forsythe, Martin A. and Seress, Laszlo R. and Rom{\'a}n-Salgado, Carolina and Trepte, Kai and Atahan-Evrenk, Sule and Er, Suleyman and Shrestha, Supriya and Mondal, Rajib and Sokolov, Anatoliy and Bao, Zhenan and Aspuru-Guzik, Alan",
+title  ="Lead candidates for high-performance organic photovoltaics from high-throughput quantum chemistry - the {H}arvard {C}lean {E}nergy {P}roject",
+journal  ="Energy Environ. Sci.",
+year  ="2014",
+volume  ="7",
+issue  ="2",
+pages  ="698-704",
+publisher  ="The Royal Society of Chemistry"
+}
+
+@article{cep-2011-olivares,
+author ="Olivares-Amaya, Roberto and Amador-Bedolla, Carlos and Hachmann, Johannes and Atahan-Evrenk, Sule and S{\'a}nchez-Carrera, Roel S. and Vogt, Leslie and Aspuru-Guzik, Alan",
+title  ="Accelerated computational discovery of high-performance materials for organic photovoltaics by means of cheminformatics",
+journal  ="Energy Environ. Sci.",
+year  ="2011",
+volume  ="4",
+issue  ="12",
+pages  ="4849-4861",
+publisher  ="The Royal Society of Chemistry",
+}
+
+@incollection{cep-2013-amador,
+author ="Amador-Bedolla, Carlos and Olivares-Amaya, Roberto and Hachmann, Johannes and Aspuru-Guzik, Alan",
+title  ="Towards Materials Informatics for Organic Photovoltaics",
+booktitle  ="Informatics for Materials Science and Engineering",
+editor = "K. Rajan",
+year  ="2013",
+publisher  ="Elsevier",
+address = "Amsterdam"
+}
+
+@article{andrieu:2006-adaptive,
+  ajournal = "Ann. Appl. Probab.",
+  author = "Andrieu, Christophe and Moulines, Eric",
+  journal = "The Annals of Applied Probability",
+  number = "3",
+  pages = "1462--1505",
+  publisher = "The Institute of Mathematical Statistics",
+  title = "On the ergodicity properties of some adaptive {MCMC} algorithms",
+  volume = "16",
+  year = "2006"
+}
+
+@article{andrieu:2008-adaptive-tutorial,
+year={2008},
+journal={Statistics and Computing},
+volume={18},
+number={4},
+title={A tutorial on adaptive {MCMC}},
+publisher={Springer US},
+author={Andrieu, Christophe and Thoms, Johannes},
+pages={343-373}
+}
+
+@article{gelman:1992-inference,
+  title={Inference from iterative simulation using multiple sequences},
+  author={Gelman, Andrew and Rubin, Donald B},
+  journal={Statistical Science},
+  pages={457--472},
+  year={1992},
+  publisher={JSTOR}
+}
+
+@article{schober:2014-ode,
+	title = "Probabilistic {ODE} Solvers with {R}unge-{K}utta Means",
+	author = "Michael Schober and David Duvenaud and Philipp Hennig",
+	note = "Available at arXiv:1406.2582",
+	year = "2014"
+}
+
+@inproceedings{waterland:2014-asc,
+ author = {Waterland, Amos and Angelino, Elaine and Adams, Ryan P. and Appavoo, Jonathan and Seltzer, Margo},
+ title = {{ASC}: {A}utomatically Scalable Computation},
+ booktitle = {Proceedings of the 19th International Conference on Architectural Support for Programming Languages and Operating Systems},
+ series = {ASPLOS '14},
+ year = {2014},
+ location = {Salt Lake City, Utah, USA},
+ pages = {575--590},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@inproceedings{waterland:2013-caches,
+ author = {Waterland, Amos and Angelino, Elaine and Cubuk, Ekin D. and Kaxiras, Efthimios and Adams, Ryan P. and Appavoo, Jonathan and Seltzer, Margo},
+ title = {Computational Caches},
+ booktitle = {Proceedings of the 6th International Systems and Storage Conference},
+ series = {SYSTOR '13},
+ year = {2013},
+ location = {Haifa, Israel},
+ pages = {8:1--8:7},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+}
+
+@journal{xian-blog,
+	author = {Christian Robert},
+	title = {Accelerating {MCMC} via parallel predictive prefetching},
+	url = {http://xianblog.wordpress.com/},
+	year = 2014,
+	month = apr,
+	day = 7,
+	booktitle = {Xi'an's Og}
+}
+
+@article{swersky:2014-freeze-thaw,
+   author = {Kevin Swersky and Jasper Snoek and Ryan P. Adams},
+    title = {Freeze-Thaw {B}ayesian Optimization},
+  note = "Available at arXiv:1406.3896",
+archivePrefix = "arXiv",
+   eprint = {1406.3896},
+     year = 2014,
+    month = jun
+}
+
+@inproceedings{snoek:2012-bayes-opt,
+title = {Practical {B}ayesian Optimization of Machine Learning Algorithms},
+author = {Snoek, Jasper and Larochelle, Hugo and Adams, Ryan P.},
+booktitle = {Advances in Neural Information Processing Systems~25},
+pages = {2951--2959},
+year = {2012},
+series = {NIPS~'12}
+}
+
+@inproceedings{pan:2013-optimistic,
+  author    = {Xinghao Pan and
+               Joseph E. Gonzalez and
+               Stefanie Jegelka and
+               Tamara Broderick and
+               Michael I. Jordan},
+  title     = {Optimistic Concurrency Control for Distributed Unsupervised
+               Learning},
+  booktitle = {Advances in Neural Information Processing Systems~26},
+  series = {NIPS~'13},
+  year      = {2013},
+  pages     = {1403-1411}
+}
+
+@article{kung:1981-optimistic,
+ author = {Kung, H. T. and Robinson, John T.},
+ title = {On Optimistic Methods for Concurrency Control},
+ journal = {ACM Transactions on Database Systems},
+ issue_date = {June 1981},
+ volume = {6},
+ number = {2},
+ month = jun,
+ year = {1981},
+ issn = {0362-5915},
+ pages = {213--226},
+ numpages = {14},
+ publisher = {ACM},
+ address = {New York, NY, USA}
+} 
+
+@inproceedings{recht:2011-hogwild,
+    title={Hogwild: A Lock-Free Approach to Parallelizing Stochastic Gradient Descent},
+    author={Recht, Benjamin and Re, Christopher and Wright, Stephen and Niu, Feng},
+    booktitle={Advances in Neural Information Processing Systems~23},
+    series={NIPS~'10},
+    pages={693--701},
+    year={2011}
+}
+
+@inproceedings{raman:2008-spice,
+ author = {Raman, Easwaran and Vachharajani, Neil and Rangan, Ram and August, David I.},
+ title = {Spice: {S}peculative parallel iteration chunk execution},
+ booktitle = {Proceedings of the 6th annual IEEE/ACM international symposium on Code generation and optimization},
+ series = {CGO '08},
+ year = {2008},
+ location = {Boston, MA, USA},
+ pages = {175--184},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@inproceedings{marcuello:1999-value-prediction,
+ author = {Marcuello, Pedro and Tubella, Jordi and Gonz\'{a}lez, Antonio},
+ title = {Value Prediction for Speculative Multithreaded Architectures},
+ booktitle = {Proceedings of the 32Nd Annual ACM/IEEE International Symposium on Microarchitecture},
+ series = {MICRO 32},
+ year = {1999},
+ location = {Haifa, Israel},
+ pages = {230--236},
+ publisher = {IEEE Computer Society},
+ address = {Washington, DC, USA},
+} 
+
+@article{kullback:1951,
+ajournal = "Ann. Math. Statist.",
+author = "Kullback, S. and Leibler, R. A.",
+journal = "The Annals of Mathematical Statistics",
+month = "03",
+number = "1",
+pages = "79--86",
+publisher = "The Institute of Mathematical Statistics",
+title = "On Information and Sufficiency",
+volume = "22",
+year = "1951"
+}

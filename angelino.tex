@@ -1,39 +1,91 @@
-\documentclass[11pt]{article}
+\documentclass[12pt,oneside]{book}
 
-\usepackage{amsmath,amssymb,amsthm}
+% not for harvard version ...
+%\usepackage{thesis}
+
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\usepackage[round]{natbib}
+\usepackage{subfiles}
+\usepackage{latexsym,fullpage}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
 \usepackage{hyperref}
-\usepackage[usenames]{color}
+%\usepackage[usenames]{color}
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
-\usepackage{subfigure}
-%%\usepackage[round,colon]{natbib}
+\usepackage{sidecap}
+\usepackage{setspace}
+%\usepackage{subfig}
+\usepackage{appendix}
+\usepackage{breakcites}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage[disable]{todonotes}
+\setlength{\marginparwidth}{0.9in}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
 
 \input{latex_macros}
+\frenchspacing
+\hyphenation{speed-up}
+
+\renewcommand{\familydefault}{\rmdefault}
 
 \begin{document}
-\title{DRAFT}
-\author{Elaine Angelino}
 
-\maketitle
+\frontmatter
 
-\begin{abstract}
-\input{files/abstract}
-\end{abstract}
+\subfile{files/front}
 
 \newpage
 
-\section{Predictive prefetching}
-\label{sec:prefetching}
-\input{files/prefetching}
+\tableofcontents
 
-\section{Evaluation}
+\subfile{files/thanks}
+
+\mainmatter
+
+\doublespacing
+
+\chapter{Motivation and summary}
+\label{sec:introduction}
+\subfile{files/introduction}
+
+\chapter{Markov chain Monte Carlo}
+\label{sec:mcmc}
+\subfile{files/mcmc}
+
+\chapter{Predictive prefetching with transition operator approximation}
+% target density estimation
+\label{sec:prefetching}
+\subfile{files/prefetching}
+
+\chapter{System architecture and implementation}
+\label{sec:system}
+\subfile{files/system}
+
+\chapter{Empirical evaluation}
 \label{sec:evaluation}
-\input{files/evaluation}
+\subfile{files/evaluation}
+
+\chapter{Conclusions and generalizations}
+\label{sec:conclusions}
+\subfile{files/conclusions}
 
 \bibliography{refs}
-\bibliographystyle{plain}
+\bibliographystyle{abbrvnat}
 
 \newpage
-\appendix 
+
+\begin{appendices}
+\chapter{Additional parameters in experiments}
+\label{sec:appendix}
+\input{files/appendix}
+\end{appendices}
 
 \end{document}

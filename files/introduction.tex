@@ -1,0 +1,239 @@
+\documentclass[angelino.tex]{subfiles} 
+\begin{document}
+
+A central tool of modern data analysis is \emph{inference},
+the process of estimating structure in data via probabilistic modeling.
+The goal is to recover the parameters of a probabilistic
+description of data, given a set of observations.
+In particular, Bayesian inference uses Bayes' rule to update
+a probabilistic description of model parameters as more data are observed.
+Sadly, inference is computationally expensive when the underlying functions are
+high-dimensional and/or full of many local optima,
+as is typical with large datasets.
+In general, there are no analytic solutions to these problems;
+there are approximate and simulated approaches, but these are often
+slow and do not naturally leverage modern computing resources, such as clouds.
+
+Inference is dominated by two approaches:
+using \emph{optimization} procedures to find the best model parameter setting 
+and the Bayesian approach of \emph{integrating} with respect to the
+relative probabilities of various parameter settings.
+This thesis focuses on Bayesian procedures, which have been mostly absent
+in discussions of large-scale inference until very recently.
+While there have been recent successes in scaling inference procedures,
+most have focused on optimization.
+
+The main computation in Bayesian inference is that of the
+\emph{posterior} density~$\pi(\theta \given \x)$
+over the parameters~$\theta$ to a probabilistic model,
+given a set of observed data~$\x = \{x_1, \dots, x_n\}$.
+The posterior is proportional to the product of two other probability densities,
+a \emph{likelihood}~$\pi(\x \given \theta)$ describing the probability
+of the data, given the model,
+and a \emph{prior}~$\pi_0(\theta)$ over the model parameters.
+Bayesian inference is appealing because the posterior density
+encodes uncertainty over model parameters;
+this uncertainty can then be propagated to downstream applications.
+However, there are often no analytic solutions to
+useful functions of the posterior, such as expectations;
+typically these involve integrating over the parameters.
+While samples from the posterior can be used to estimate quantities of 
+interest, there is usually no analytic way to obtain them.
+This motivates approximate sampling-based methods such as
+\emph{Markov chain Monte Carlo} (MCMC) and \emph{importance sampling}.
+Unfortunately, these methods are difficult to scale,
+which has inhibited their application to large datasets.
+
+This thesis focuses on MCMC, a widely used, powerful and general technique
+for both optimization and Bayesian inference.
+In the optimization setting, it stochastically searches a parameter space for
+the best setting of~$\theta$.
+In Bayesian inference, it produces a sequence of samples drawn from a
+sequence of distributions that converge to the posterior distribution.
+These algorithms are typically slow to converge so they must be run for many 
+iterations before they yield useful output.
+Furthermore, they are inherently \emph{serial} and
+thus, in general, do not parallelize well.
+
+Reliance on serial algorithms is a great frustration given the power of today's
+scientific computing environments, which are highly parallel.
+Researchers have routine access to hundreds to thousands of parallel cores in
+multicore environments, where computational work can be distributed over
+multiple cores that are able to communicate with one another.
+Thus, our ability to perform large-scale Bayesian inference is
+limited by our algorithms, not our computational resources.
+
+The pseudocode in Algorithm~\ref{serial} illustrates the serial nature of
+many Bayesian inference procedures:
+start with some initial setting of model parameters~$\theta_0$,
+then iteratively select the next parameter setting~$\theta_1$ from some
+set of choices that depend on~$\theta_0$, 
+then~$\theta_2$ from choices that depend on~$\theta_1$, and so on.
+Each iteration can take a long time --
+\eg because selecting~$\theta_{t}$ for $t > 0$ depends on the
+computationally expensive evaluation of~$\pi(\theta_t \given \x)$.
+If we had~$N$ cores and could perform~$N$ iterations at a time in parallel,
+then we could speed-up execution by a factor of~$N$.
+However, since each iteration depends on the last, it is not possible to skip
+ahead to later iterations without first completing earlier ones.
+Specifically, the iteration indexed by~$t$ produces~$\theta_{t+1}$ in a way that 
+depends on knowing~$\theta_t$, which in turn depends
+on~${\theta_{t-1}, \theta_{t-2}, \dots, \theta_0}$,
+only the last of which is known initially.
+
+\begin{algorithm}[t]
+\caption{Serial Bayesian inference}
+\label{serial}
+\begin{algorithmic}
+\State Specify a dataset $\x$, a posterior density $\pi(\theta \given \x)$
+and an initial parameter setting $\theta_0$.
+\For {$t$ in $0, \dots, T$}
+\State Generate one or more parameter settings $\{\theta'\}$
+that depend on $\theta_t$.
+\State Select $\theta_{t+1}$ from $\{\theta'\}$ by comparing
+the evaluations of $\{\pi(\theta' \given \x)\}$ to $\pi(\theta \given \x)$.
+\EndFor
+\State Output some function of $\theta_1, \theta_2, \theta_3, \dots$.
+\end{algorithmic}
+\end{algorithm}
+
+%This model of computation maps naturally to single core execution
+%but it is not obvious how it could make use of multiple parallel cores.
+%If, given an initial state, $N - 1$ additional intermediate program states were
+%known in advance, $N$ parallel cores could be used to divide computational work
+%by initiating serial execution from these states plus the initial state.
+%Each of these executions could be stopped upon reaching one of the known
+%intermediate states,
+%thereby together producing a complete execution of the program.
+%However, later program states depend on earlier program states and are not
+%generally known until they are reached via serial execution.
+
+That said, there is nothing to stop us from materializing predictions
+for~$\theta^{t}$ and executing the corresponding iterations on parallel cores.
+This is a form of \emph{speculative execution}, the technique of
+optimistically performing computational work that might be eventually useful.
+%The utility of speculative execution toward accelerating a serial algorithm
+%depends on our ability to partition the algorithm into segments whose
+%serial execution can be scheduled across available cores.
+%Since later segments depend on values computed by earlier segments,
+%this depends on our ability to predict such values.
+\textbf{This dissertation demonstrates that MCMC inference can be accelerated 
+in a model of parallel computation that uses speculation to predict and complete
+computational work ahead of when it is known to be useful.}
+
+Below, we outline how the remaining chapters demonstrate the veracity of
+this thesis statement.
+In Chapter~\ref{sec:mcmc}, we review Markov chain Monte Carlo,
+an algorithmic approach for stochastically estimating the expectation of a
+function with respect to a probability distribution.
+Computing such an expectation might be an intractable task,
+\eg its exact calculation might involve a sum of exponentially many values
+or an integral with no known analytic solution.
+MCMC combines two powerful ideas -- Markov chains and Monte Carlo integration --
+and we begin by explaining the basic theory and properties of all three.
+In particular, the serial nature and convergence behavior of MCMC algorithms
+derive from their underlying use of Markov chains.
+The Metropolis--Hastings (MH) algorithm provides a concrete introduction to
+MCMC; it is a simple and canonical algorithm that illustrates
+the challenges and limitations of MCMC.
+The rest of the chapter categorizes existing MCMC algorithms according to
+their strategies for improving on na\"{i}ve algorithms such as MH.
+The algorithms in the first of two broad categories attempt to decrease the time
+to reach convergence; those in the second make use of parallel resources.
+We do not provide a complete review of all MCMC algorithms,
+which have been reviewed elsewhere, but we do thoroughly summarize existing
+parallel MCMC algorithms that use speculative techniques,
+called \emph{prefetching} in this literature.
+Finally because this thesis is motivated by large-scale Bayesian inference,
+the chapter ends with a summary of MCMC algorithms
+recently proposed for this setting.
+
+The core intellectual contributions of this thesis are in
+Chapter~\ref{sec:prefetching}, where we propose and analyze a new class of
+prefetching MCMC algorithms.
+First, we provide a mathematical language for describing a large class
+of MCMC algorithms that can be mapped to, and would benefit from, prefetching.
+This treatment is more formal and general than what has been provided by
+prior prefetching literature but is designed to motivate prefetching
+and elucidate its feasibility and validity.
+For concreteness, the remainder of the thesis focuses on Metropolis--Hastings,
+where prefetching requires speculating about the outcome of a binary condition
+at each iteration of the algorithm.
+This motivates \emph{predictive prefetching},
+a principled framework for exploiting predictions about these binary outcomes
+so as to most effectively allocate parallel resources.
+The goal is to maximize the expected speed-up relative to serial execution,
+given parallel cores and predictive information.
+We derive predictors for the setting of large-scale Bayesian inference that
+we later use directly in the empirical studies of Chapter~\ref{sec:evaluation}.
+Finally, since perfect predictions are not normally available,
+we analyze the performance of predictive prefetching in terms of expected
+speed-up as a function of predictor accuracy and the number of parallel cores.
+
+Chapter~\ref{sec:system} describes the design and implementation
+of a practical parallel system for predictive prefetching.
+The system architecture follows a master-worker pattern in which a single master
+core maintains information about computational work that might be useful,
+determines what work is carried out by the remaining worker cores,
+and records the results of these computations.
+The master maintains data structures that organize the results of potentially
+useful increments of computational work, plus related information.
+These increments of work include all those that exactly correspond to equivalent
+serial execution and are eventually identified as such with absolute certainty.
+Workers request work from the master whenever they are available,
+the master replies to each worker with a specification of the work to do,
+and workers send computed results back to the master.
+The system guarantees results equal to serial execution,
+\ie invariant to the number of cores used.
+Since MCMC algorithms are stochastic, this guarantee depends critically
+on correct management of the source of (pseudo)randomness.
+This issue is subtle and the solution presented here is more careful
+than any provided in prior literature on prefetching.
+The implementation includes a simple plug-in interface for specifying
+a concrete instantiation of a MH algorithm via user-defined functions.
+We also provide remaining details about specific implementation choices and
+artifacts.
+
+Next, in Chapter~\ref{sec:evaluation}, we present an empirical evaluation
+of the parallel implementation of predictive prefetching
+in a real research computing environment.
+We select and implement concrete large-scale Bayesian inference problems
+involving both synthetic and real datasets.
+The efficiency of predictive prefetching depends on the behavior of MH,
+which in turn depends in a sensitive fashion on parameters that are
+typically hand-tuned by practitioners according to heuristic guidelines.
+Furthermore, this behavior changes -- often dramatically -- over the course of
+running a single instantiation of the algorithm.
+To execute reasonably calibrated experiments,
+we identify an adaptive MH scheme that eliminates this tuning problem and
+requires only a simple extension to our original implementation for MH.
+We clearly describe a framework for assessing chain convergence,
+which we use to identify different regimes of chain behavior. 
+We present and discuss empirical results for speed-up as a function of
+the number of parallel cores used, measured relative to a baseline
+system implementation with one master and one worker.
+The chapter ends with a discussion of the overheads of our system.
+
+Finally, in Chapter~\ref{sec:conclusions} we distill the conclusions of this
+thesis, including lessons learned and a map of possible extensions to this work.
+We will have demonstrated effective use of relatively na\"{i}ve prediction
+strategies, therefore we identify additional promising strategies for
+predictive prefetching, emphasizing generic methods based on
+constructing approximations to a target density.
+We also outline technical challenges for predictive prefetching
+in the context of more sophisticated MCMC algorithms,
+then propose and justify potential solutions.
+We end with a broad discussion of opportunities for applying
+speculative execution to algorithms ranging across various properties:
+stochastic versus deterministic, exact versus approximate or heuristic,
+discrete versus continuous.
+
+%\eanote{TO DO:
+%\begin{itemize}
+%\item Illustration of Algorithm 1
+%\item Sprinkling of contributions and findings that answer the reader's top
+%4-5 questions, \eg behavior during burn-in versus after convergence.
+%\end{itemize}
+%}
+
+\end{document}

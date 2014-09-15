@@ -1,0 +1,221 @@
+\documentclass[angelino.tex]{subfiles} 
+
+% other points:
+% move toward parallel hardware, reasons why invest in speculative stuff
+% probabilistic programming, compilers
+% we could have split up the data
+
+\begin{document}
+
+We presented parallel predictive prefetching, a general framework for accelerating many widely used MCMC algorithms that are inherently serial and often slow to converge.
+%
+Our approach applies to MCMC algorithms whose transition operator can be decomposed into two functions: one that produces a countable set of candidate proposal states and a second that chooses the next state from among these.
+%
+Predictive prefetching uses parallel cores and speculative computation to exploit the common setting in which generating proposals is computationally fast compared to the evaluation required to choose from among them and this latter evaluation can be approximated quickly.
+%
+Our first focus has been on the MH algorithm, in which predictive prefetching exploits a sequence of increasingly accurate predictors for the decision to accept or reject a proposed state.
+%
+Our second focus has been on large-scale Bayesian inference, for which we identified an effective predictive model that estimates the likelihood from a subset of data.
+%
+The key insight is that we model the uncertainty of these predictions with respect to the difference between the likelihood of each datum evaluated at the proposal and current state.  
+%
+As these evaluations are highly correlated, the variance of the differences is much smaller than the variance of the states evaluated separately, leading to significantly higher confidence in our predictions.
+%
+This allows us to justify more aggressive use of parallel resources, leading to greater speedup with respect to serial execution or more na\"{i}ve prefetching schemes.
+
+
+The best speedup that is realistically achievable for this problem is sublinear in the number of cores but better than logarithmic, and our results achieve this.
+%
+As noted in Section~\ref{sec:multi-way}, it would be straightforward to
+combine predictive prefetching with parallelism at each node;
+we would expect this to yield much better speedups for the Bayesian inference
+problems we considered, which lend themselves to this kind of parallelism.
+%
+Our empirical evaluation only studied Bayesian inference problems, for which
+we constructed fast approximations to the target density via data subsets.
+%
+Other common approximations for probability distributions are formed from
+Taylor series expansions, \eg as used by~\citet{christen-fox-2005-approx},
+and linear or Gaussian process regressions, \eg as used by~\citep{conrad:2014-local}.
+%
+Our approach generalizes both to schemes that learn an approximation to the
+target density and to other MCMC algorithms with more complex structure,
+such as slice sampling and more sophisticated adaptive techniques.
+
+
+In predictive prefetching, we maintain a tree data structure where each node
+corresponds to a set of parameters at which it might be useful to evaluate
+the target density; each node is associated with a utility.
+%
+In our system, the master core represents the tree and schedules workers to the
+highest utility nodes.
+Each worker incrementally evaluates the assigned target,
+and each partial computation updates node utilities.
+Subsequently, the master might instruct workers to abandon their current work
+and reassign them to different nodes.
+The master caches partial computations at abandoned nodes and can later have
+other workers recommence where previous workers were stopped.
+%
+Our approach is reminiscent of a recent Bayesian optimization
+algorithm by~\citet{swersky:2014-freeze-thaw}.
+%
+\emph{Bayesian optimization} alternates between proposing a set of parameters and
+evaluating them with respect to some potentially expensive objective function.
+In particular, these could be the hyperparameters to a machine learning model
+that take a long time to fit~\citep{snoek:2012-bayes-opt}.
+%
+Swersky et al. combine a cache of `frozen' partial  evaluations,
+the ability to `thaw' and continue these evaluations,
+a pool of new candidate parameters that haven't been evaluated at all,
+and an information theoretic utility model to decide what to evaluate next,
+\ie something frozen or something new.
+%
+In this setting, all potential evaluations yield some information, but the amount
+of information gained depends on the evaluations that have been performed already
+-- \eg once a particular parameter setting has been (partially) evaluated,
+other nearby parameter evaluations may not be expected to add much information.
+%
+In contrast, in our setting, a constant but \emph{a~priori} unknown subset of
+potential computations must be performed; all other speculative computations are
+wasteful and eventually known to have zero utility. 
+%
+We note that the parallel Bayesian optimization strategy developed 
+by~\citet{snoek:2012-bayes-opt},  which sequentially decides what parameters to
+evaluate next, could be extended to incorporate the freeze-thaw framework.
+
+
+An important contribution of our research has been to provide greater exposure
+to prefetching ideas, which did not appear to be well-known when we began.
+%
+In response to our publication of a short version of this work on
+arXiv,\footnote{This article has since been published in peer-reviewed
+conference proceedings~\citep{angelino:2014-prefetching}.}
+a statistician published a review of our work on his blog,
+indicating that he had previously been unfamiliar with prefetching~\citep{xian-blog}.
+%
+We are happy to report that, with colleagues, he has since combined na\"ive
+prefetching with a delayed acceptance method~\citep{banterle-2014-delayed}.~\todo{Expand.}
+%
+We hope that other researchers will also find prefetching ideas to be useful
+and develop more powerful predictive prefetching techniques, in particular.
+
+
+Our curiosity in speculative execution is not limited to prefetching for MCMC --
+we are broadly interested in it as a general computational technique.
+%
+In fact, this dissertation grew out of prior research that developed a
+computational model for exploiting speculative execution to parallelize
+serial programs~\citep{waterland:2013-caches,waterland:2014-asc}.
+This dissertation is a focused study of the power of speculative execution,
+applied to a particular class of algorithms.
+%
+Our system architecture presented in Chapter~\ref{sec:system} shares some
+similarities with the architecture developed in our prior work.
+In both, a master manages the state of computation and schedules workers to
+perform (speculative) computation; workers also generate information used to
+form probabilistic predictions about what work to perform next.
+There are also significant differences; in particular, our work with MCMC makes
+explicit use of algorithm-level semantics and structure -- this information is
+distilled in our central data structure, the jobtree.
+
+
+Our study of MCMC in the context of speculative execution is in the spirit of
+a recent area of work that develops new parallel machine learning algorithms
+by adapting ideas from the systems community, especially database research.
+Most of this work focuses on optimization problems, rather than Bayesian inference.
+%
+In particular, \citet{pan:2013-optimistic} describe three different parallel
+approaches to leveraging data parallelism.
+%
+When a parallel version of a serial algorithm enforces \emph{serializability},
+it maintains a strict but partial order on operations to yield output equivalent
+to serial execution; the partial order specifies groups of operations that may
+run \emph{concurrently} (in parallel).
+%
+The first method, \emph{mutual exclusion}, maintains serializability via locks.
+It limits the amount of achievable parallelism
+and incurs potentially significant overhead due to locking,
+but straightforwardly maintains properties of the original algorithm,
+\eg correctness, if applicable.
+%
+Alternatively, a \emph{coordination-free} approach throws away locks,
+and with them, their associated overheads as well as the automatic
+retention of desirable algorithmic properties. 
+\citet{recht:2011-hogwild} applied this idea to stochastic gradient descent,
+rebranding it as ``hogwild,'' and developed theoretical tools
+to prove its correctness under certain conditions. 
+Both the name and general approach have gained popularity in the machine learning community.
+%
+A third method, \emph{optimistic concurrency control} (OCC), guarantees
+serializability while remaining lock-free.
+Developed by~\citet{kung:1981-optimistic}, OCC proceeds similarly to the 
+coordination-free approach, but it checks for actions that
+violate serializability constraints and must correct for any such actions.
+%
+Machine learning algorithms that have only weak dependencies between
+computations on different (groups of) data items can be good candidates for 
+coordination-free or OCC approaches.
+%
+Pan et al. implement a policy that is inspired by OCC;
+using knowledge about specific serial machine learning algorithms,
+they develop concurrency control mechanisms that preserve algorithm semantics.
+%
+For example, a clustering algorithm updates
+a global variable indicating the cluster centers.
+In the serial algorithm, these are always up-to-date.
+In their algorithm, the data are partitioned across machines, each of which
+maintains a possibly out-of-date, or \emph{stale}, version of the global variable.
+No constraints are violated unless this variable changes in a way that affects
+computations on machines that don't yet know about the change,
+\eg when a new cluster center is introduced.
+When this happens, a special master core discards computations in conflict with
+required constraints and ensures that the correct computations are performed.
+%
+Ultimately, Pan et al. suggest that we might be able to develop a continuum of
+concurrency policies that trade-off between correctness and speed.
+
+
+To recapitulate, speculative execution is a general approach for accelerating
+computation by optimistically performing computation that might be useful.
+%
+We view the original form of OCC as similar to a restricted form of
+speculative execution where the optimistic computations are based on a possibly
+stale understanding of the true state and pursued in a depth-first manner.
+%
+In our research, we drive speculative scheduling decisions by actively 
+predicting what computations to do and furthermore coherently qualify our
+predictions within a Bayesian probabilistic framework.
+Thus far, we have limited ourselves to speculative techniques
+that yield output invariant to the number of parallel cores.
+%
+We agree with~\citet{pan:2013-optimistic} that
+it could be fruitful to relax hard serializability constraints,
+especially for machine learning algorithms, as ``we may be able to partially or 
+\emph{probabilistically} accept non-serializable operations in a way that
+preserves underlying algorithm invariants.''
+%
+A complementary perspective suggests that areas of approximate computation or
+heuristic algorithms might tolerate more aggressive forms of speculative execution.
+%
+Beyond machine learning algorithms, differential equation solvers present an
+intriguing area for further study.
+These computational workhorses perform forward numerical integration of systems
+of differential equations -- an inherently serial procedure.
+\citet{schober:2014-ode} recently developed a probabilistic ordinary
+differential equation solver that could be a good candidate for a
+prediction-based speculative execution framework and furthermore suggests
+trade-offs between accuracy and speed.
+
+
+Many computational problems, especially in but not limited to machine learning,
+may benefit from being revisited with the arsenal of techniques from
+the systems community.
+%
+Simultaneously, many existing systems ideas may be augmented by viewing them
+through the principled twin lenses of machine learning and information theory.
+%
+We speculate that these complementary approaches will yield novel and useful
+algorithms more fully capable of exploiting future computational resources.
+
+
+\end{document}

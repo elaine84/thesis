@@ -1,0 +1,1029 @@
+\documentclass[angelino.tex]{subfiles} 
+\begin{document}
+
+\emph{Markov chain Monte Carlo} (MCMC) is a widely used, powerful technique for 
+estimating statistics of an arbitrary distribution~$\Pi$
+%with probability density function~$\pi(x)$,
+defined over a state space~$\X$.
+MCMC simulates a random walk that produces a sequence of samples drawn from a 
+sequence of distributions that converges to~$\Pi$.
+% with densities that converge to~$\pi(x)$.
+MCMC is typically employed when samples from, or statistics of,
+a distribution cannot be obtained analytically, as is often the case
+with complex, high-dimensional systems arising across disciplines,
+\eg estimating bulk material properties from molecular dynamics physics
+simulations or inferring the parameters of Bayesian probabilistic models
+describing large datasets.
+
+In this chapter, we first review the two powerful tools underlying
+MCMC algorithms -- \emph{Markov chains} and \emph{Monte Carlo} methods.\eanote{Swap Markov chain and Monte Carlo sections?}
+Next, we introduce MCMC via the well-known \emph{Metropolis-Hastings} algorithm,
+both as a way to concretely exemplify relevant concepts and to motivate a large
+body of research whose goal is to design more efficient MCMC algorithms.
+We then provide an overview of different classes of these approaches, with
+greater focus on the areas that together provide the foundation for a new
+approach to large-scale MCMC that we present in the next chapter.
+
+\section{Markov chains}
+
+Let~$\X$ be a discrete or continuous state space and
+let~$x, x' \in \X$ denote states.
+A Markov chain
+%$\Phi = \{\phi_0, \phi_1, \dots, \}$ is a countable set of
+%random variables.
+is a discrete-time stochastic process governed by a
+transition operator~${T(x \rightarrow x')}$ 
+that specifies the probability of transitioning
+from a current state~$x$ to some next state~$x'$.
+It is \emph{memoryless} in the sense that its future behavior depends only
+on the current state and is independent of its past history --
+this is known as the Markov property.
+%Markov chains were developed by Andrey Markov in the early twentieth century.
+
+Many systems can be modeled by Markov chains.
+For example, an unbiased random walk on a one-dimensional lattice is described
+by a Markov chain.  The integers modulo~$k$ can be used to index a finite
+lattice of~$k$ states, in which case~${\X = \ints_k}$.
+The transition operator,
+\be
+T(x \rightarrow x-1 \mod k) = T(x \rightarrow x+1 \mod k) =  T(x \rightarrow x \mod k) = \frac{1}{3}, \label{random-walk}
+\ee
+describes a random walk on the lattice, with periodic boundaries,
+that at each time step either moves to the `left' or `right' by one unit,
+or stays put, where the three scenarios are equiprobable.
+%\eanote{This random walk or diffusive behavior is slow at
+%exploring the space, requiring in expectation $O(k^2)$ time steps for an
+%instance of the  Markov chain to reach a distance $d = k$ units away from any
+%initial condition, \ie visit all states. We can see this by observing \dots}
+Here, the stationary distribution is simply the uniform distribution over
+$\ints_k$.
+
+Given an initial distribution~$P^0(x)$ over~$\X$, a Markov chain evolves this
+distribution from one time point to the next through iterative application of
+the transition operator; after~$t$ steps let us call this distribution~$P^t(x)$.
+Direct \emph{simulation} of a Markov chain follows this iterative construction
+and leads to inherently serial implementations.
+We are interested in Markov chains that \emph{converge} to a unique
+\emph{stationary distribution}~$\pi(x)$ in the sense that
+\[
+\lim_{t \rightarrow \infty} P^t(x) \rightarrow \pi(x),
+\]
+for any initial distribution~$P^0(x)$.
+
+The \emph{speed of convergence} or \emph{mixing time} of a Markov chain measures
+how quickly~$P^t(x)$ approaches~$\pi(x)$; it is typically defined with respect to
+a distance measure between probability distributions and a threshold.
+For example, it could be defined as the minimum or expected number of steps~$t$
+such that~${D_{\text{KL}}(\pi(x) ~ \| ~ P^t(x)) < \epsilon}$,
+for some appropriate~${\epsilon > 0}$, where $D_{\text{KL}}(P \| Q)$
+is the \emph{Kullback-–Leibler divergence} of two distributions~$P$ and~$Q$,
+and we think of~$Q$ as an approximation to~$P$ \citep{kullback:1951}.
+Convergence behavior depends on the properties of the state space~$\X$
+-- \eg whether it is discrete or continuous, its dimensionality --
+and the behavior of the transition operator.
+%Suppose two Markov chains can have the same stationary distribution
+%but one mixes faster.
+%Intuitively, this occurs because its transition operator encourages larger
+%`jumps' between states, \eg by having a smaller probability of self-transition
+%$T(x \rightarrow x)$ for all $x \in \X$.
+
+For example, consider a simulation of a one-dimensional, $k$-state random walk,
+described by the transition operator in Eq.~\ref{random-walk}.
+The mixing time is~$O(k^2)$, \ie the simulation requires~$O(k^2)$ steps to
+`forget' the initial condition and look reasonably like
+the uniform stationary distribution.
+\eanote{Explain.}
+In contrast, consider a deterministic transition operator that always moves
+to the `right', \ie $T(x \rightarrow x + 1) = 1$.
+This time, simulation requires only~$O(k)$ steps to approach
+the uniform stationary distribution.
+While this simple example represents an extreme case that is not useful for
+typical applications, it illustrates how two Markov chains can have the
+same stationary distribution but different convergence behavior.
+A major area of Markov chain research is understanding how to design efficient
+transition operators that converge quickly, as doing so has direct practical
+consequences for their simulation.
+
+For a transition operator~$T(x \rightarrow x')$ to have~$\pi(x)$ as its
+stationary distribution, its application must leave~$\pi(x)$ invariant
+over the entire space, \ie
+\be
+\sum_{x \in \X} T(x \rightarrow x') \pi(x) = \pi(x'), \quad \forall x' \in \X \nn
+\ee
+for a discrete state space, or
+\be
+\int_\X T(x \rightarrow x') \pi(x) dx = \pi(x'), \quad \forall x' \in \X \label{stationary}
+\ee
+for a continuous state space; this thesis will focus on continuous state spaces.
+For the stationary distribution to be unique, \ie not depend on
+the initial distribution, the Markov chain must be \emph{irreducible}:
+for any $x, x' \in \X$ such that $\pi(x), \pi(x') > 0$,
+it must be possible to reach $x'$ from $x$ in a finite number of steps.
+A powerful application of Markov chains involves designing a transition operator
+that has as its stationary distribution some target distribution of interest
+-- this is the main idea behind Markov chain Monte Carlo methods.
+
+In restricted cases it is easy to show that a transition operator has a certain
+stationary distribution.
+Notably, when a transition operator $T(x \rightarrow x')$ is \emph{reversible},
+it satisfies \emph{detailed balance} with respect to a distribution~$\pi(x)$,
+\be
+T(x \rightarrow x') \pi(x) = T(x' \rightarrow x) \pi(x'), \label{detailed-balance}
+\ee
+and it is easy to show that~$\pi(x)$ is its stationary distribution.
+Integrating over~$\X$ on both sides gives:
+\bea
+\int_\X T(x \rightarrow x') \pi(x) dx
+&=& \int_\X T(x' \rightarrow x) \pi(x') dx \nn \\
+&=& \pi(x') \int_\X T(x' \rightarrow x) dx \nn \\
+&=& \pi(x'), \nn
+\eea
+which is precisely the required condition from Eq.~\ref{stationary}.
+We can interpret Eq.~\ref{detailed-balance} as stating that,
+for a reversible Markov chain starting from its stationary distribution,
+any transition $x \rightarrow x'$ is equilibrated by
+the corresponding reverse transition $x' \rightarrow x$.
+As we will see, many MCMC methods are based on deriving reversible
+transition operators.
+A transition operator that is not reversible is called \emph{non-reversible};
+it is generally more difficult to manipulate and prove statements about these.
+
+%Finally, we note that since the stationary distribution of a Markov chain is
+%rarely known \emph{a priori}, a practical challenge of simulating Markov chains
+%is that it is difficult to assess whether a materialized chain has effectively
+%converged; this will be one of our concerns in our empirical studies. 
+
+For a formal introduction to Markov chains, see the book by~\citet{meyn-tweedie:1993}.
+
+\section{Monte Carlo methods}
+
+%Monte Carlo methods as we know them were developed in the 1940s
+%by Stanislaw Ulam and John von Neumann at at Los Alamos Scientific Laboratory.
+Monte Carlo methods are a broad class of algorithms that simulate many repeated
+random samples to estimate some quantity of interest.
+%Molecular dynamics simulations, blah and blah are all Monte Carlo simulations.
+For example, the following procedure is a form of
+\emph{Monte Carlo integration} that estimates the area under any positive
+function ${f: [a, b] \rightarrow \reals^+}$,
+where ${-\infty < a < b < \infty}$:
+\begin{enumerate}
+\item Draw a box around~$f$ with vertical boundaries set by the
+interval~$[a, b]$ and horizontal boundaries set by~$0$
+and an upper bound~$m$ on the maximum value of~$f$ in the interval.
+\item Sample a large number of random points~$(x, y)$ uniformly
+within the box and for each, determine whether the point falls below or
+above~$f$ by computing whether $f(x) < y$.
+\item Let $r$ be the fraction of points such that~$f(x) < y$.
+Since the total area of the box is $m(b-a)$, multiplying by~$r$
+provides an estimate for $\int_a^b f(x) dx$.
+\end{enumerate}
+
+More generally, when we can think of an integral as an expectation,
+Monte Carlo integration invokes the law of large numbers
+to estimate this expectation via a sample average.
+Specifically, if we can write an integral as the expectation of a
+function~$f(x)$ with respect to a distribution~$\Pi$ with probability density
+function $\pi(x)$,
+\be
+\E_\Pi(f) = \int f(x) \pi(x) dx,
+\label{expectation}
+\ee
+then we can estimate this integral by averaging over a set of 
+samples~$\{x_n\}_{n=1}^N$ from~$\Pi$ as:
+\[
+\bar{f}_N \equiv \frac{1}{N} \sum_{n=1}^N f(x_n).
+\]
+Since the samples are independent, as long as the expectation in 
+Eq.~\ref{expectation} exists and is finite,
+this sum obeys the law of large numbers.
+Hence, the estimate is unbiased and its variance scales as the inverse sample
+size $1/N$, or equivalently, its error scales as $1/\sqrt{N}$.
+In our example above, the integral of $f(x)$ on the interval $[a, b]$ can be
+thought of as an expectation with respect to the uniform distribution on
+$[a, b]$.
+%More concretely, we can write down a central limit theorem (CLT) for $f_n$:
+%\be
+%\lim_{N \rightarrow \infty)
+%\sqrt{N}(\bar{f}_N - \E_\Pi(f)) \rightarrow \N(0, \sigma^2),
+%\ee
+%where the variance is bounded and given by
+%\be
+%\var^2 = \Var_\Pi(f(X_0)) + 2 \sum_{n=1}^\infty \Cov_\Pi(f(X_0, f(X_i)).
+%\ee
+
+Monte Carlo integration thus requires sampling from a distribution, which is
+sometimes straightforward, as with the uniform and normal distributions,
+but in general requires numerical simulation.
+Below, we describe two additional Monte Carlo methods that address this issue
+in restricted settings:
+\emph{rejection sampling} and \emph{importance sampling}.
+Their limitations and inefficiencies will help motivate Markov chain
+Monte Carlo methods, which are more sophisticated but related techniques.
+For simplicity, we describe these procedures with respect to one-dimensional
+normalized probability densities; both can be generalized.
+
+\subsection{Rejection sampling}
+
+Rejection sampling uses one distribution to sample from another
+by exploiting information relating the two;
+\citet{von-Neumann:1951-random} provided an algorithm for this method.
+Suppose that we want to sample from a \emph{target distribution}~$\Pi$ with
+probability density function~$\pi(x)$.
+Suppose further that we can sample from a \emph{proposal distribution}~$Q$
+whose probability density function~$q(x)$ can be scaled by a
+constant factor~$\gamma$ to provide an upper bound on~$\pi(x)$,
+\eg we might be able to scale a normal distribution so that our distribution of
+interest lies below it everywhere.
+If we satisfy these requirements, then we can use
+rejection sampling to generate \emph{proposals} from~$Q$ that we stochastically
+\emph{accept} or \emph{reject} according to the relative difference
+between~$\gamma q(x)$ and~$\pi(x)$. Specifically, to produce one sample:
+\begin{enumerate}
+\item Generate a proposal $x$ by drawing a sample from the
+      proposal distribution~$Q$.
+\item Draw a sample $y$ uniformly from the interval $[0, \gamma q(x)]$.
+\item If $y < \pi(x)$, accept~$x$.
+      Otherwise, reject~$x$ and return to Step 1.
+\end{enumerate}
+Rejection sampling is most efficient in the limit where the scaled proposal
+density equals the target density, in which case all proposals are accepted.
+More generally, in expectation, this procedure accepts proposals at a rate given
+by~$\int \pi(x) / (\gamma q(x)) dx \le 1$.
+
+\subsection{Importance sampling}
+
+Similar to rejection sampling, importance sampling also uses information from
+one distribution to sample from another, but with fewer restrictions.
+Suppose we have distributions~$\Pi$ and~$Q$ as above, where this time we
+can simply think of~$q(x)$ as an approximation to~$\pi(x)$;
+\ie we do not require some~$\gamma q(x)$ that is an upper bound to~$\pi(x)$.
+Suppose we want to compute the expectation of some function~$f(x)$ with
+respect to the distribution~$\Pi$:
+\[
+\E_\Pi (f(x)) = \int f(x) \pi(x) dx.
+\]
+By multiplying and dividing by~$q(x)$ inside the integral,
+\[
+\E_\Pi (f(x)) = \int \frac{f(x) \pi(x)}{q(x)} q(x) dx
+\equiv \E_Q \left(f(x) w(x) \right),
+\]
+we change nothing, but can interpret this new expression as the
+expectation of $f(x)$ weighted by $w(x) = p(x) / q(x)$ with respect to $Q$.
+We can Monte Carlo estimate this integral using a set of samples
+$\{x_n\}_{n=1}^N$ from $Q$:
+\[
+\frac{1}{N} \sum_{n=1}^N f(x_n) w(x_n).
+\]
+%The $w(x^n)$ are called \emph{importance ratios} or \emph{importance weights}.
+The quality of this estimator depends on how much $f(x) w(x)$ varies --
+ideally this quantity would be constant with respect to $x$.
+Some historical notes and a list of references on importance sampling can be
+found in the textbook by~\citet{gelman:1993-bda}.
+
+\subsection{Limitations of Monte Carlo sampling}
+
+The primary limitation of both rejection sampling and importance sampling is
+that for these methods to be feasible and practical, each requires a proposal
+distribution that can be sampled easily and is in some sense
+close to the target distribution.
+To produce samples, both methods use a set of
+independent samples from the proposal distribution;
+rejection sampling selects from among the proposals
+and importance sampling `fixes up' the proposals by assigning each a weight.
+\todo{Ex. where IS fails: var(pi/q) huge, estimate meaningless.}
+
+\section{Markov chain Monte Carlo}
+
+Markov chain Monte Carlo (MCMC) methods simulate a Markov chain whose stationary
+distribution is equal to a target distribution of interest.
+When this Markov chain is simulated, it produces samples from a sequence of
+distributions that asymptotically equals the target distribution.
+The principles of Monte Carlo integration, estimation and sampling thus apply to 
+these samples in the asymptotic limit.
+Concretely, for a Markov chain started from its stationary distribution~$\Pi$
+with density~$\pi(x)$, a sequence of $N$ samples $\{x_n\}_{n=1}^N$ can be used
+to estimate an expectation~$E_\Pi(f) = \int_X f(x) \pi(x) dx$ using Monte Carlo
+integration via the sample average~$\bar{f}_N = \frac{1}{N} \sum_{n=1}^N f(x_n)$.
+The efficiency of a MCMC transition operator can be analyzed with respect to
+both the variance of this estimator, also known as the
+\emph{asymptotic variance}, as well as the speed of convergence or mixing time.
+In practice, we use samples produced by simulated chains of finite length,
+typically started away from stationarity.
+The materialized sequence of samples obeys the Markov property and is
+correlated, which is in contrast to the independent samples obtained by simple
+Monte Carlo methods such as rejection sampling and importance sampling.
+
+The remaining sections of this chapter give an incomplete overview of
+MCMC algorithms for sampling applications, with greater emphasis on
+certain procedures either for the purpose of providing general background
+or to review those most directly related to this thesis.
+%We do not discuss other important applications of MCMC methods,
+%such as optimization.
+First, we describe the Metropolis-Hastings (MH) algorithm, a canonical and
+simple MCMC method.
+We use MH to build some intuition for the behavior of MCMC algorithms,
+and to illustrate its limitations that motivate more sophisticated approaches.
+The following two sections classify these further approaches into serial
+algorithms designed to converge more quickly than MH and parallel algorithms.
+Finally, we briefly review MCMC algorithms that exploit common features of
+Bayesian inference problems.
+For a general introduction to MCMC, see the highly motivating review by~\citet{diaconis-2008-revolution}.
+
+\section{Metropolis-Hastings (MH)}
+
+%\eanote{Metropolis, Metrolis-Hastings, Gibbs}
+
+%\noi Consider any system that can be described by a fixed probability density
+%distribution $p$ over some state space $\X$.
+%Suppose we are interested in generating samples according to distribution $p$
+%or computing statistics of this distribution.
+%While these tasks can be performed exactly and analytically for some
+%distributions, they are in general intractable.
+
+% hydrogen bomb...
+% In 1953, again at Los Alamos Scientific, Metropolis \etal were interested in
+% quantities computed from the equilibrium distribution of a system of $N$
+% particles governed by their pairwise interactions~\cite{metropolis-1953}.
+% Here, the state space $\X$ is $$
+% is the set of all possible particle configurations
+% on a lattice and the target distribution of interest $p$ .
+
+The Metropolis-Hastings (MH) algorithm simulates a Markov chain, over a
+state space~$\X$, with stationary distribution equal to some target
+distribution of interest.
+Given an initial state $x_0$, a target distribution~$\pi$ and
+a proposal function~$q(x' \vert x)$,
+MH generates a sequence of states~$x_1, \dots, x_T \in \X$
+drawn from a sequence of distributions that converges to the target.\footnote{
+As is common in the literature, we will henceforth use the same symbol
+to refer to both a distribution and its probability density function;
+the interpretation should be clear from context.}
+We provide pseudocode for MH in Algorithm~\ref{mh}.
+Each iteration, a proposal for the next state~$x'$ is drawn from the
+proposal distribution, conditioned on the current state~$x$;
+\eg a common choice is to sample from a Gaussian centered at~$x$.
+The proposal is stochastically accepted with probability given by the 
+\emph{acceptance~ratio},
+\be
+r = \frac{\pi(x') q(x \given x')}{\pi(x) q(x' \given x)},
+\ee
+via comparison to a random variate~$u$ drawn uniformly from the interval~$[0, 1]$.
+If~${u < r}$, then the next state is set to the proposal, otherwise,
+the proposal is rejected and the next state is set to the current state.
+MH is a generalization of the \emph{Metropolis algorithm}~\citep{metropolis-1953}, 
+which requires the proposal distribution to be symmetric,
+\ie~${q(x' \vert x) = q(x \vert x')}$, in which case
+the acceptance ratio is simply~${r = \pi(x') / \pi(x)}$.
+\citet{hastings-1970} later relaxed this by showing that the proposal
+distribution could be arbitrary.
+
+%The canonical MCMC algorithm is Metropolis-Hastings, in which generating
+%each sample requires evaluating the posterior at a proposed value of $\theta$.
+%Evaluating the likelihood term is the dominant and expensive computational cost,
+%since it is a function of the entire input dataset.
+
+\begin{algorithm}[t]
+\caption{Metropolis-Hastings}
+\label{mh}
+\begin{algorithmic}
+\State \textbf{Input:} Initial state $x_0$, number of iterations $T$, target $\pi(x)$, proposal $q(x' \given x)$
+\State \textbf{Output:} Samples $x_1, \dots, x_T$
+\For {$t$ in $0, \dots, T-1$}
+\State $x' \sim q(x' \given x_t)$ \Comment{Generate proposal}
+\State $r \gets \dfrac{\pi(x') q(x_t \given x')}{\pi(x_t) q(x' \given x_t)}$
+       \Comment{Compute acceptance ratio}
+\State $u \sim \Unif(0, 1)$ \Comment{Draw random number}
+\If {$u < r$}
+    \State $x_{t+1} \gets x'$ \Comment{Accept proposal}
+\Else
+    \State $x_{t+1} \gets x_t$ \Comment{Reject proposal}
+\EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The MH algorithm can be viewed as a biased random walk that
+always accepts proposals when
+${\pi(x') q(x \given x') > \pi(x) q(x' \given x)}$ and
+stochastically rejects them otherwise;
+for a symmetric proposal distribution, these scenarios can be
+interpreted as accepting `uphill' proposals and
+stochastically rejecting `downhill' proposals.
+We can see that the stationary distribution is indeed~$\pi$ by showing
+that the MH transition operator satisfies detailed balance,
+as defined in Eq.~\ref{detailed-balance}.
+From the algorithm description, the MH transition operator is:
+\[
+T(x \rightarrow x') = \min(1, r) q(x' \given x) =
+\min\left(1, \frac{\pi(x') q(x \given x')}{\pi(x) q(x' \given x)}\right) q(x' \given x).
+\]
+We can verify the detailed balance condition as follows:
+\bea
+T(x \rightarrow x') \pi(x)
+&=& \min\left(1, \frac{\pi(x') q(x \given x')}{\pi(x) q(x' \given x)}\right) q(x' \given x) \pi(x) \nn \\
+&=& \min\left(\pi(x) q(x' \given x), \pi(x') q(x \given x')\right) \nn \\
+&=& \min\left(\frac{\pi(x) q(x' \given x)}{\pi(x') q(x \given x')}, 1\right) q(x \given x') \pi(x') \nn \\
+&=& T(x' \rightarrow x) \pi(x'). \nn
+\eea
+
+\subsection{Factors affecting the behavior of MH}
+\label{sec:mh-behavior}
+
+The MH algorithm is both simple to implement and quite general;
+it is thus appealing and widely applicable.
+However, the MH algorithm has a major drawback -- it can be slow to converge.
+This is due to the fact that the steps of the underlying Markov chain
+are correlated, which can be viewed as random walk or diffusive behavior.
+One broad strategy for increasing the efficiency of MCMC methods is to
+design transition operators that behave less like simple diffusion;
+we survey several techniques for doing so in the next section.
+
+Within the MH framework and given a target density, the variable parameters are
+the proposal distribution and the initial condition.
+Let us first consider the proposal distribution.
+For example, for a one-dimensional continuous target density, if we restrict
+the proposal distribution to be Gaussian and centered at the current state,
+$q(x' \given x) = \N(x' \given x, \sigma^2)$,
+then there is a single tuning parameter: the distribution's standard
+deviation~$\sigma$, which gives the expected `step size' of the proposal
+with respect to the current state.
+This affects the MH \emph{acceptance rate}, 
+which we also refer to as the \emph{acceptance probability},
+\ie the fraction of proposals that are accepted.
+
+To illustrate the relationship between the proposal distribution and the
+acceptance rate, consider unimodal target and proposal distributions.
+Suppose that we are able to initialize MH at a state
+close to the target distribution's mode with respect to its width.
+Intuitively, if the proposal step size is large compared to the width of the
+target, then proposals will tend to fall in faraway, low-probability regions,
+resulting in a low acceptance rate.
+On the other hand, if the step size is very small, then the target density
+at the proposal will be very close to that at the current state,
+in which case the algorithm will tend to accept proposals,
+but the samples will be highly correlated and the chain will take a long time
+explore the area under the target density.
+This suggests that there is some notion of an optimal MH acceptance rate
+corresponding to some intermediate proposal step size.
+
+A classic result is that the optimal value for the MH acceptance rate is~0.234, 
+derived for the scenario where the target and proposal distributions are 
+multidimensional Gaussians, in the limits where the chain has converged and
+the number of dimensions tends to infinity~\citep{roberts-1997-accept}.
+A heuristic widely followed by practitioners is to tune the proposal
+distribution to obtain an observed acceptance rate of about~0.234.
+
+The sensitivity of the acceptance rate as a function of
+the proposal distribution also explains why the MH algorithm
+has trouble sampling from multimodal target densities.
+When modes are far apart compared to the widths of the peaks around them,
+they are separated by low-probability regions that are difficult for a
+simulated MH chain to traverse.
+In these cases, the MH algorithm tends to get `stuck' for many iterations
+around local modes, instead of sampling globally from the entire distribution.
+In practice, a MH simulation tends to find the mode closest to the initial state
+and then samples the area around this mode.
+
+Given target and proposal distributions, the only other specification required
+by the MH algorithm is an initial state.
+Clearly, it is desirable for the initial state to be close to some probable
+region of the target density -- 
+a `bad' initial state combined with the random walk nature of chain simulation
+yields initial samples that are not representative of the target.
+This initial portion of a MCMC simulation, before convergence,
+is sometimes called \emph{burn-in}.
+
+The behavior of a MCMC simulation during burn-in is different from that after
+convergence, because the shape of the target density differs
+far from versus close to the bulk of its mass.
+Specifically, the target density tends to be `flatter' or `less steep'
+around a mode compared to less probable regions.
+This characterization interacts with proposal generation,
+resulting in acceptance behavior that changes from burn-in to convergence.
+
+To illustrate differences in MCMC behavior between burn-in and convergence, 
+consider MH for a Gaussian target distribution.
+\todo{Picture.}
+Typically, a MCMC simulation is initiated at some informed guess that is still
+somewhat far from higher probability regions of the target; assuming it is
+well-behaved, the chain should eventually spend more time in these regions.
+A Gaussian distribution has its mass concentrated around a single mode.
+A region close to this mode can be well-approximated by an upside down parabola
+-- a quadratic function -- while the tails fall off exponentially quickly.
+Suppose also that our proposal distribution is symmetric and its width
+is not large compared to the width of the target.
+In the region close to the target mode, the target densities
+evaluated at two nearby states will tend to be comparable values.
+In the context of MH, the acceptance ratio~$r$ will be well within the
+interval~$[0, 1]$ and the decision to accept or reject a proposal depends on
+both~$r$ and the random variate~$u$.
+If we consider two nearby states in the tail regions, then the target
+density evaluated at one will be exponentially smaller than the other.
+Here, the acceptance ratio~$r$ will be close to either 0 or 1, so the
+random variate~$u$ has little influence over whether a proposal is accepted.
+As we will see later, these differences between chains during burn-in and
+convergence have implications for the performance of our new approach to
+MCMC as well as our empirical studies.
+
+% Adaptive MH.
+
+%In practice, MCMC is used in scenarios where the target distribution $p$ is
+%unknown and so it can be difficult or impossible to be certain whether the
+%algorithm has converged and is producing samples representative of $p$.
+%There are several common heuristics, without any particular 
+
+%\subsection{Gibbs sampling}
+
+\section{MCMC methods for faster convergence}
+
+In this section, we survey classes of MCMC algorithms designed to
+converge more quickly than the MH algorithm by reducing the 
+correlation between successive states.
+We do not provide a thorough review, as the methods we develop in this
+thesis do not build directly on these techniques.
+However, we do describe specific algorithms both for concreteness, and because
+we will later consider them within the context of \emph{predictive prefetching},
+a new framework we present in Chapter~\ref{sec:prefetching}.
+
+%Below, we review two broad classes of approaches to speeding up MCMC:
+%designing algorithms that discourage diffusive behavior
+%in order to decrease the mixing time and parallel approaches.
+
+\subsection{Auxiliary variable methods}
+
+Given a target density~$\pi(x)$, we can introduce an
+\emph{auxiliary variable}~$y$ and define a new density~$\pi(x, y)$
+such that~$\int \pi(x, y) dy = \pi(x)$,
+\ie marginalizing out $y$ the yields the target.
+Auxiliary variable methods design MCMC sampling schemes over the space of a new
+joint distribution; after sampling from~$\pi(x, y)$, one obtains samples 
+from~$\pi(x)$ simply by ignoring the~$y$ values.
+While it would seem less desirable to sample from a higher dimensional space,
+it is possible to design transition operators over the joint space that
+marginally sample from the target in a way that is more efficient than
+Metropolis-Hastings.
+
+For example, consider a one-dimensional target density
+$\pi(x): \reals \rightarrow \reals^+$.
+Sampling from~$\pi(x)$ yields a sequence of samples along the real line.
+Now consider a representation of the target in the $(x, y)$-plane
+such that $y = \pi(x)$.
+If we sample a set of points $\{(x_i, y_i)\}$ uniformly within the 
+two-dimensional area between~$\pi(x)$ and the $x$-axis, then marginally,
+the~$\{x_i\}$ are samples from~$\pi(x)$.
+Below, we summarize two auxiliary variable methods:
+slice sampling and Hamiltonian Monte Carlo.
+
+\emph{Slice sampling} methods are based on the above idea, sampling from the
+joint distribution~$\pi(x, y)$ by iteratively sampling each variable 
+marginally~\citep{neal:2003-slice}.
+Given some state~$x_i$, the procedure constructs~$y_i$ and then
+the next~$x_{i+1}$ as follows:
+\begin{enumerate}
+\item Sample $y_i \sim \pi(y_i \given x_i)$ by sampling
+      uniformly from the (vertical) interval $[0, \pi(x_i)]$.
+\item Sample $x_{i+1} \sim \pi(x_{i+1} \given y_i)$ by sampling uniformly
+      from the (horizontal) intervals where $\pi(x) > y_i$.
+\end{enumerate}
+We think of $y_i$ as defining a horizontal `slice' through the distribution.
+Slice sampling has multiple advantages over Metropolis-Hastings.
+The procedure has the opportunity to mix well with respect to sampling from
+the target distribution, because a horizontal slice may correspond to a
+large domain that is sampled uniformly, so $x_{i+1}$ can be very far from $x_i$.
+In practice, it can be tricky to sample the~$x_i$ since doing so in full
+would require constructing the inverse of $\pi(x)$, but there are various
+procedures for avoiding this issue while maintaining correctness.
+Notice also that there is no proposal distribution in slice sampling,
+which means fewer tuning parameters. % and no notion of rejected proposals.
+
+\emph{Hybrid Monte Carlo} (HMC) introduces an auxiliary `momentum' variable
+to embed the action of sampling from the target density~$\pi(x)$ within a
+physical system  described by classical mechanics~\citep{duane:1987-hmc};
+it is also called \emph{Hamiltonian Monte Carlo}~\citep{neal:2010-hmc}.
+First, think of~$(x, -\pi(x))$ as defining an `upside down' surface where the
+original modes of~$\pi(x)$ are `valleys' and low-probability regions are
+`uphill.'
+Now consider a frictionless puck with mass $m$ moving around this surface --
+its dynamics will be described by its position and its momentum.
+HMC generates a proposal for a Metropolis algorithm by giving the puck a kick
+in some direction with some velocity, both random.
+The puck's trajectory is simulated for some fixed amount of time $\tau$ by
+integrating the system's equations of motion; the final position at time $\tau$
+is the proposal.
+This can generate faraway but useful proposals because the puck
+tends to go downhill toward high-probability regions;
+it glides over flat equiprobable regions and loses momentum by moving
+uphill toward low-probability regions.
+
+%Swendsen-Wang \\
+
+\subsection{Ensemble methods}
+\label{sec:ensemble}
+
+\emph{Ensemble} (or \emph{population}) methods run multiple chains and
+accelerate mixing by sharing information between the chains.
+Examples include affine-invariant ensemble
+sampling~\citep{goodman-2010-ensemble} and
+generalized elliptical slice sampling~\citep{nishihara-2014-gess}.
+Below, we focus on a class of ensemble approaches known as
+\emph{annealing methods}.
+
+Recall that the MH algorithm has trouble sampling from multimodal distributions.
+Informally, `flatter' distributions are easier to sample from compared to
+`peaky' distributions, especially multimodal ones.
+Now consider the probabilistic interpretation of a physical
+multi-state system at temperature $\tau > 0$: for a state~$x \in \X$,
+its probability~$p(x)$ is proportional to the exponential of the negative of
+its energy~$E(x)$ divided by the temperature, \ie
+\be
+p(x) \propto \exp(-E(x) / \tau). \label{energy}
+\ee
+For a given system defined by states and their energies, raising the temperature
+has the effect of flattening the distribution over those states, while
+maintaining important features.
+Annealing methods leverage this intuition to sample
+more efficiently from difficult targets.
+
+%The idea of annealing comes from the popular optimization heuristic of
+%\emph{simulated annealing} (SA).
+%While it is not a MCMC method, we review SA for historical reasons and because
+%it is easily understood as a modification to the Metropolis-Hastings algorithm.
+
+As an example of a popular annealing method, we describe
+\emph{parallel tempering}~\citep{iba:2001-ensemble}.\footnote{Following~\citet{murray-2007-thesis}, we cite a review that chronicles
+the history of parallel tempering.}
+Let~$\pi(x)$ be the target density over a state space~$\X$.
+The idea is to construct a single Markov chain on the product space~$\X^K$
+corresponding to an \emph{ensemble} of~$K$ Metropolis-Hastings
+simulations of the system specified by~$\pi(x)$ and Eq.~\ref{energy} or its 
+continuous analog, each at a different temperature.
+Simulations at higher temperatures explore the space more quickly than those
+at lower temperatures, and they can share information through interactions.
+One of the~$K$ simulations is constructed to marginally have as its stationary 
+distribution the target~$\pi(x)$.
+Explicitly, we can define the system via an energy function of the
+form~${\mathcal{E}(x) = -\log(\pi(x))}$.
+Now we specify~$K$ distributions:
+\[
+\pi_k(x) \propto \exp(-\mathcal{E}(x) c_k), \quad k = 1, \dots K,
+\]
+where $c_k$ can be interpreted as an inverse temperature.
+Notice that~$c_k = 1$ yields~$\pi_k(x)$ equal to the target~$\pi(x)$,
+and~$c_k = 0$ results in a constant.
+Thus to obtain~$K$ copies of the system, with one equal to the target and
+the rest at higher temperatures, we can choose the~$c_k$ so that
+${c_1 = 1 > c_2 > c_3 > \dots > c_K \ge 0}$.
+In each iteration of the algorithm, the~$K$ simulations are advanced according
+to a MH acceptance rule, but they are also allowed to interact,
+\eg a pair of simulations may exchange states.
+Thus, the slower mixing chain indexed by~$k=1$ may jump to
+states explored by faster mixing chains at higher temperatures.
+Parallel tempering is popular because its implementation is a straightforward
+modification to the MH algorithm.
+
+There are several additional classes of annealing methods and
+other ensemble methods; an excellent review can be found in the PhD thesis 
+by~\citet{murray-2007-thesis}.
+
+%simulated tempering / expanded ensembles
+%annealed importance sampling
+%tempered transitions
+
+%\subsection{Particle methods}
+
+\subsection{Non-reversible methods}
+
+The methods described above are representative of the rich menagerie of MCMC algorithms 
+developed using reversible Markov chains where the probability that the chain
+is in state~$x$ and transitions to state~$x'$ is equal to the probability that
+it is in state~$x'$ and transitions to~$x$.
+This condition of detailed balance is straightforward to check, which helps
+explain the invention of many reversible MCMC methods.
+Recall that the goal of these methods is to discourage the
+diffusive behavior of simple Metropolis-Hastings.
+Intuitively, diffusion is not an efficient mechanism for mixing, say, a cake
+batter -- one uses a spoon or electric mixer to induce a flow that is not
+equilibrated by a flow in the opposite direction.
+
+Such non-reversibility that discourages `backtracking' has been difficult to
+study; a handful of articles describe methods limited to discrete state spaces.
+These include the theoretical and numerical analysis 
+by~\citet{diaconis:2000-non-reversible} of a simple non-reversible chain.
+The authors start with a reversible unbiased random walk on a one-dimensional
+finite lattice and then make two copies of the state space,
+one `upstairs' for transitions to the `right' and
+one `downstairs' for transitions to the `left',
+plus transitions between the two levels.
+This non-reversible chain converges more quickly
+according to two different distance metrics.
+\citet{geyer:2000-non-reversible} reanalyze the same system, this time with
+respect to asymptotic variance, and find that the most efficient version of the 
+non-reversible chain sweeps through the states in a deterministic way.
+In a related fashion, \citet{neal:2004-non-reversible} constructs non-reversible 
+chains from reversible chains and demonstrates that their asymptotic variance is
+no worse than the original reversible chains.
+Other non-reversible schemes are inspired by non-diffusive physical systems,
+such as a method for inserting `vortices' by~\citet{sun:2010-vortices}.
+
+%\cite{diaconis:2013-things}
+%\cite{turitsyn:2008-irreversible}
+
+\section{Parallel MCMC}
+
+The most obvious way to parallelize MCMC is to run independent simulations in
+parallel and aggregate their samples.
+However, this embarrassingly parallel approach does not help to reduce the
+mixing time, which can be prohibitively long and would be replicated across
+the parallel instances.
+
+In MCMC, the computational cost is most often determined by the expense of
+evaluating the target density relative to the mixing time.
+For example in Metropolis--Hastings, this cost is incurred when the target is 
+evaluated to determine the acceptance ratio of a proposed move.
+%in slice sampling~\citep{Neal03}
+%an expensive target slows both bracket expansion and contraction.
+We focus on the increasingly common case where the target is expensive and the 
+dominant computational cost.
+This evaluation can sometimes be parallelized directly,
+\eg when the target function is a product of many individually expensive terms.
+This sometimes arises in Bayesian inference if the target can be easily
+decomposed into one likelihood term for each data item.
+Scalability (\ie practically achievable speedup) in this setting is limited by
+the communication and computational costs associated with aggregating
+the partial evaluations.
+In general, the target function cannot be parallelized;
+we divide methods that accelerate MCMC via other sources of parallelism into
+two classes: parallel ensemble sampling and~prefetching.
+
+\subsection{Parallel ensemble samplers}
+
+The ensemble methods discussed earlier run multiple chains that can be simulated
+in parallel, where any information sharing between chains requires communication.
+Examples include parallel tempering, described in Section~\ref{sec:ensemble},
+the emcee implementation~\citep{goodman-2012-emcee}
+of affine-invariant ensemble sampling~\citep{goodman-2010-ensemble}
+and a parallel implementation of
+generalized elliptical slice sampling~\citep{nishihara-2014-gess}.
+
+\subsection{Prefetching}
+\label{sec:mcmc-prefetching}
+
+The second class of parallel MCMC algorithms uses parallelism through
+speculative execution to accelerate individual chains.
+This idea is called \emph{prefetching} in some of the literature and appears to
+have received only limited attention.
+To the best of our knowledge, prefetching has only been studied in the context
+of the MH algorithm where, at each iteration, a single new proposal is drawn
+from a proposal distribution and stochastically accepted or rejected.
+As shown in Algorithm~\ref{mh}, the body of a MH implementation is a
+loop containing a single conditional statement and two associated branches.
+We can thus view the possible execution paths as a binary tree,
+illustrated in Figure~\ref{tree}.
+The vanilla version of prefetching speculatively evaluates all paths in this
+binary tree~\citep{brockwell-2006-prefetching}.
+The correct path will be exactly one of these, so with~$J$ cores, this approach 
+achieves a speedup of~$\log_2 J$ with respect to single core execution,
+ignoring communication and bookkeeping overheads.
+
+\begin{figure}[t!]
+  \centering%
+  \resizebox{\columnwidth}{!}{%
+    \def\radius {5mm}
+    \tikzstyle{state}=[circle, thick, minimum size=\radius, font=\footnotesize]
+    \begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 5cm/#1, level distance = 1.5cm}]
+      \draw [white,-] (-6cm,-0.75cm) -- (6cm,-0.75cm);
+   %   \draw [gray,-] (-6cm,-2.25cm) -- (6cm,-2.25cm);
+   %   \draw [gray,-] (-6cm,-3.75cm) -- (6cm,-3.75cm);
+      \node [state] {$x^t$}
+      child{ node [state] {$x^{t+1}_\bits{0}$}
+        child{ node [state] {$x^{t+2}_{\bits{00}}$}
+          child{ node [state] {$x^{t+3}_{\bits{000}}$}}
+          child{ node [state] {$x^{t+3}_{\bits{001}}$}}
+        }
+        child{ node [state] {$x^{t+2}_{\bits{01}}$}
+          child{ node [state] {$x^{t+3}_{\bits{010}}$}}
+          child{ node [state] {$x^{t+3}_{\bits{011}}$}}
+        }
+      }
+      child{ node [state] {$x^{t+1}_1$}
+        child{ node [state] {$x^{t+2}_{\bits{10}}$}
+          child{ node [state] {$x^{t+3}_{\bits{100}}$}}
+          child{ node [state] {$x^{t+3}_{\bits{101}}$}}
+        }
+        child{ node [state] {$x^{t+2}_{\bits{11}}$}
+          child{ node [state] {$x^{t+3}_{\bits{110}}$}}
+          child{ node [state] {$x^{t+3}_{\bits{111}}$}}
+        }
+      }
+      ;
+      %\node [state] at (5.5cm, 0) {$u^{t}$};
+      %\node [state] at (5.5cm, -1.5) {$u^{t+1}$};
+      %\node [state] at (5.5cm, -3) {$u^{t+2}$};
+      %\node [state] at (5.5cm, -4.5) {$u^{t+3}$};
+    \end{tikzpicture}
+  }
+  \caption{Metropolis--Hastings conceptualized as a binary tree.
+  Nodes at depth~$d$ correspond to iteration~$d$, where the root is at depth~0,
+  and branching to the right/left indicates that the proposal is accepted/rejected.
+  Each subscript is a sequence, of length~$d$, of~\bits{0}'s and~\bits{1}'s,
+  corresponding to the history of rejected and accepted proposals
+  with respect to the root.  
+  %The random variates (on right) are shared across the layer.}
+  }
+  \label{tree}
+\end{figure}
+
+Na\"{i}ve prefetching can be improved by observing that the two branches are not 
+taken with equal probability.
+On average, the reject branch tends to be more probable;
+the classic result for the optimal MH acceptance rate is 
+0.234~\citep{roberts-1997-accept}, so most prefetching scheduling policies
+have been built around the expectation of rejection.
+Let~${\alpha \le 0.5}$ be the expected acceptance rate. 
+\citet{byrd-2008-SMP} introduced \emph{speculative moves}, a procedure that 
+speculatively evaluates only along the `reject' branch of the binary tree;
+in Figure~(\ref{tree}), this corresponds to the left-most branch.
+In each round of their algorithm, only the first~$k$ out of~${J-1}$ extra cores 
+perform useful work, where~$k$ is the number of rejected proposals before the
+first accepted proposal, relative to the root of the tree.
+The expected speedup is then:
+\begin{align*}
+1 + \E(k) < 1 + \sum_{k=0}^\infty k (1-\alpha)^k \alpha
+< 1 + \frac{1-\alpha}{\alpha} = \frac{1}{\alpha}\,.
+\end{align*}
+The first term on the left is due to the core at the root of the tree, 
+which always performs useful computation in prefetching schemes.
+For an acceptance rate of ${\alpha=0.23}$, this scheme yields a maximum expected 
+speedup of about~$4.3$, reaching about~$4$ with~$16$ cores, and thus is more 
+limited than the na\"{i}ve prefetching policy since it essentially cannot take 
+advantage of additional cores.
+\citet{byrd-2010-speculative} later considered the special case where the
+evaluation of the target occurs on two timescales, slow and fast.
+This method, called \emph{speculative chains}, modifies speculative moves so
+that when the target evaluation is slow, available cores are used to 
+speculatively evaluate the subsequent chain, assuming the slow step accepts.
+
+Further extensions to the na\"{i}ve prefetching scheme allocate cores according
+to the optimal `tree shape' with respect to various assumptions about the
+probability of rejecting a proposal, \ie by greedily allocating cores to nodes
+that maximize the depth of speculative computation expected to be 
+correct~\citep{strid-2010-prefetching}.
+Next, we summarize Strid's schemes and reference related ideas.
+\emph{Static prefetching} assumes a fixed acceptance rate; versions of this were
+proposed earlier in the context of simulated annealing~\citep{witte-1991-SA}.
+\emph{Dynamic prefetching} estimates the acceptance probabilities,
+\eg at each level of the tree by drawing empirical MH samples (100,000 in the 
+evaluation), or at each  branch in the tree by computing~$\min(\beta, \hat{r})$ 
+where~$\beta$ is a constant (${\beta = 1}$ in the evaluation) and~$\hat{r}$ is
+an estimate of the MH acceptance ratio based on a fast approximation to the
+target function. 
+Alternatively, Strid proposes using the approximate target function to identify
+the single most likely path on which to perform speculative computation.
+Strid also combines prefetching with other sources of parallelism to obtain a 
+multiplicative effect.
+To the best of our knowledge, these prefetching methods have been
+evaluated on up to 64 cores, although usually many fewer.
+
+%In recent other work,~\citet{banterle-2014-delayed} combine prefetching ideas
+%with a delayed acceptance MH rule.~\todo{How to cite?}
+
+In the next chapter, we propose~\emph{predictive prefetching},
+a new scheme that, like Strid's dynamic prefetching, uses an approximation
+to the target function to predict what computations to prefetch.
+There are several fundamental differences between our work and Strid's.
+Most critically, we model the error of the target density approximation,
+and thus the uncertainty of whether a proposal will be accepted.
+%This significantly improved our speedup on several problems.
+In addition, we identify a broad class of MCMC algorithms that could benefit
+from prefetching, not just Metropolis--Hastings, and we show how prefetching
+can exploit a series of approximations, not just a single one.
+
+%\section{Two-stage MCMC}
+%\cite{murray-2007-thesis}
+%\subsection{MCMC with an approximation}
+%\cite{christen-fox-2005-approx}
+
+\section{Approximations and large-scale Bayesian inference}
+
+Real-world problems are rarely amenable to exact inference, so they require 
+approximate inference in the form of Monte Carlo estimates or
+\emph{variational} approximations.
+Unfortunately, approximate Bayesian inference can be challenging when modeling
+large data sets, as the target posterior density may become expensive to evaluate.  
+This challenge has motivated new methods for inferential computation that can
+take advantage of approximations to the target density,
+most often by examining only a subset of the data,
+or by exploiting closed form approximations
+such as Taylor series~\citep{christen-fox-2005-approx},
+or by fitting linear or Gaussian process regressions~\citep{conrad:2014-local}.
+
+In Bayesian inference, the target density involves a likelihood, which often 
+decomposes into a product of many factors corresponding to data items, \eg
+\be
+\pi(\theta \given \x) = \pi_0(\theta) \pi(\x \given \theta) 
+                 = \pi_0(\theta) \prod_{n=1}^{N} \pi(x_n \given \theta).
+\label{bayesian}
+\ee
+Below, we survey MCMC sampling schemes that exploit this factorization property,
+motivated by large-scale Bayesian inference with large datasets.
+
+\subsection{Embarrassingly parallel, approximate MCMC}
+
+Several authors have suggested partitioning a large dataset into multiple shards
+and running MCMC inference on each partition separately across parallel cores.
+Each of $J$ shards $\{\x^{(j)}\}_{j=1}^J$ defines what is sometimes called
+a \emph{subposterior}:
+\[
+\pi^{(j)}(\theta \given \x^{(j)})
+= \pi_0(\theta)^{1/J} \prod_{x \in \x^{(j)}} \pi(x \given \theta),
+\quad j = 1, \dots, J.
+\]
+The contribution from the original prior is down-weighted so that
+the original posterior is equal to the product of the $J$ subposteriors, \ie
+$\pi(\theta \given \x) = \prod_{j=1}^J \pi^{(j)}(\theta \given \x{(j)})$.
+However, it is not clear how to combine the samples from the $J$ subposteriors
+in a coherent fashion to estimate functions of the desired full posterior.
+Below, we describe three recent efforts.
+
+\citet{neiswanger-2013-ep} explore three potential solutions, ranging from
+parametric to non-parametric and semi-parametric models.
+For example, their parametric model invokes the Bayesian central limit theorem;
+they argue that since a posterior looks like a Gaussian in the limit of many
+data items, they fit each subposterior with a Gaussian, and then approximate the
+full posterior as a product of these approximate subposteriors.
+
+\citet{scott-2013-consensus} propose \emph{consensus Monte Carlo}, 
+which combines the subposteriors through a weighted average.
+For Gaussian models, the optimal weight of the~$j$th subposterior
+is~$W_j = \Sigma_j^{-1}$, the inverse of the covariance matrix~$\Sigma_j$
+of the subposterior.
+Assuming a Gaussian model, the authors Monte Carlo estimate~$\Sigma_j$ using
+the empirical sample variance from the corresponding subposterior.
+%An alternate proposal weights each element of $\theta$ by the reciprocal of
+%its marginal posterior variance.
+
+Finally, \citet{dunson:2013-weierstrass} propose a \emph{Weierstrass sampler}
+for parallel MCMC on independent data partitions; these authors provide analytic
+bounds on the approximation error of their sampler, which appears to be more
+robust than those described above.
+
+\subsection{MCMC with mini-batches}
+
+Other methods for accelerating MCMC sampling in the case of large-scale
+Bayesian inference are inspired by stochastic gradient descent.
+Traditional gradient descent performs optimization by iteratively
+computing and following a local gradient that depends on a sum of terms
+corresponding to data items~\citep{optimization:1983-book}.
+Stochastic gradient descent is remarkably simple and effective:
+at each iteration, it uses an approximate gradient based on only a
+random subset of data, called a \emph{mini-batch}, or even just a single 
+datum~\citep{murata:1998-statistical}.
+Stochastic variational inference techniques adapt these ideas to 
+variational inference~\citep{hoffman:2013-svi}, a class of Bayesian 
+procedures that can be efficient but are only approximate in the sense of
+lacking MCMC's feature of asymptotic correctness.
+
+With MCMC, the idea is to evaluate an approximate posterior whose likelihood
+term is a noisy estimate based on sampling only one or a few data items.
+Recent approaches have implemented efficient transition operators that
+lead to approximate stationary distributions~\citep{welling-2011-langevin,welling-2012-fisher,korattikara-2014-austerity,bardenet:2014-subsampling,doucet-2014-likelihood-estimator}.
+Other recent work uses a lower bound on the local likelihood factor to simulate
+from the exact posterior distribution while evaluating only a subset of the data
+at each iteration~\citep{maclaurin-2014-firefly}.
+
+%Ensuring that these estimates have the proper scale requires some care.
+%ore generally, is not obvious whether MCMC procedures tolerate this
+%approach, and a critical component of this research is to understand
+%performance in terms of accuracy, as a function of the subsample size.
+
+%This analysis will likely be related to recent results about
+%``exact approximate'' pseudo-marginal MCMC, which
+%uses a Monte Carlo estimate of the likelihood term~\cite{andrieu:2009-pseudo}
+%and was originally developed for a genetics application using importance
+%sampling for the estimate~\cite{beaumont:2003-is}.
+
+%recent developments in Markov chain Monte Carlo (MCMC) have implemented efficient transition %operators that
+%lead to approximate stationary distributions~\citep{Welling2011, Korattikara2014, Bardenet2014}.
+%
+%Recent other work uses a lower bound on the local likelihood factor to simulate from the exact posterior distribution while evaluating only a subset of the data at each iteration~\citep{maclaurin-2014-firefly}.
+
+%\section{Other methods that may end up in this chapter}
+%Adaptive methods (depend on the history of the chain) \\
+%pseudo-marginal (MC estimate the target) \\
+%austere MCMC \\
+%(MC$)^3$ (something parallel) \\
+%coupling from the past (perfect estimators) \\
+%Langevin dynamics (cross between SGD and MCMC) \\
+%online MCMC (there seems to be one attempt at this)
+
+\bigskip
+
+In the rest of this thesis, we focus on accelerating MCMC by combining
+parallelism with approximations to the transition operator through
+prefetching ideas.
+Notably, we arrive at a method in which the stationary distribution is 
+\emph{exactly} the target posterior.
+
+%We attack the problem using parallelism.
+
+\end{document}
