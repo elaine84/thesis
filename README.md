@@ -15,7 +15,7 @@ References
 
 Elaine Angelino. Accelerating Markov chain Monte Carlo via parallel predictive prefetching.
 PhD thesis, School of Engineering and Applied Sciences, Harvard University, 2014. 
-[Harvard][1] version. [Living][2] version.
+[Harvard][1] version (git tag `submit`). [Living][2] version.
 
 [Fetching][3] is the associated implementation.	
 
