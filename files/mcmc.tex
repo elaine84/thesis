@@ -331,23 +331,6 @@ For a general introduction to MCMC, see the highly motivating review by~\citet{d
 
 \section{Metropolis-Hastings (MH)}
 
-%\eanote{Metropolis, Metrolis-Hastings, Gibbs}
-
-%\noi Consider any system that can be described by a fixed probability density
-%distribution $p$ over some state space $\X$.
-%Suppose we are interested in generating samples according to distribution $p$
-%or computing statistics of this distribution.
-%While these tasks can be performed exactly and analytically for some
-%distributions, they are in general intractable.
-
-% hydrogen bomb...
-% In 1953, again at Los Alamos Scientific, Metropolis \etal were interested in
-% quantities computed from the equilibrium distribution of a system of $N$
-% particles governed by their pairwise interactions~\cite{metropolis-1953}.
-% Here, the state space $\X$ is $$
-% is the set of all possible particle configurations
-% on a lattice and the target distribution of interest $p$ .
-
 The Metropolis-Hastings (MH) algorithm simulates a Markov chain, over a
 state space~$\X$, with stationary distribution equal to some target
 distribution of interest.
@@ -376,11 +359,6 @@ which requires the proposal distribution to be symmetric,
 the acceptance ratio is simply~${r = \pi(x') / \pi(x)}$.
 \citet{hastings-1970} later relaxed this by showing that the proposal
 distribution could be arbitrary.
-
-%The canonical MCMC algorithm is Metropolis-Hastings, in which generating
-%each sample requires evaluating the posterior at a proposed value of $\theta$.
-%Evaluating the likelihood term is the dominant and expensive computational cost,
-%since it is a function of the entire input dataset.
 
 \begin{algorithm}[t]
 \caption{Metropolis-Hastings}
@@ -525,13 +503,6 @@ As we will see later, these differences between chains during burn-in and
 convergence have implications for the performance of our new approach to
 MCMC as well as our empirical studies.
 
-% Adaptive MH.
-
-%In practice, MCMC is used in scenarios where the target distribution $p$ is
-%unknown and so it can be difficult or impossible to be certain whether the
-%algorithm has converged and is producing samples representative of $p$.
-%There are several common heuristics, without any particular 
-
 %\subsection{Gibbs sampling}
 
 \section{MCMC methods for faster convergence}
@@ -544,10 +515,6 @@ thesis do not build directly on these techniques.
 However, we do describe specific algorithms both for concreteness, and because
 we will later consider them within the context of \emph{predictive prefetching},
 a new framework we present in Chapter~\ref{sec:prefetching}.
-
-%Below, we review two broad classes of approaches to speeding up MCMC:
-%designing algorithms that discourage diffusive behavior
-%in order to decrease the mixing time and parallel approaches.
 
 \subsection{Auxiliary variable methods}
 
@@ -991,31 +958,6 @@ Other recent work uses a lower bound on the local likelihood factor to simulate
 from the exact posterior distribution while evaluating only a subset of the data
 at each iteration~\citep{maclaurin-2014-firefly}.
 
-%Ensuring that these estimates have the proper scale requires some care.
-%ore generally, is not obvious whether MCMC procedures tolerate this
-%approach, and a critical component of this research is to understand
-%performance in terms of accuracy, as a function of the subsample size.
-
-%This analysis will likely be related to recent results about
-%``exact approximate'' pseudo-marginal MCMC, which
-%uses a Monte Carlo estimate of the likelihood term~\cite{andrieu:2009-pseudo}
-%and was originally developed for a genetics application using importance
-%sampling for the estimate~\cite{beaumont:2003-is}.
-
-%recent developments in Markov chain Monte Carlo (MCMC) have implemented efficient transition %operators that
-%lead to approximate stationary distributions~\citep{Welling2011, Korattikara2014, Bardenet2014}.
-%
-%Recent other work uses a lower bound on the local likelihood factor to simulate from the exact posterior distribution while evaluating only a subset of the data at each iteration~\citep{maclaurin-2014-firefly}.
-
-%\section{Other methods that may end up in this chapter}
-%Adaptive methods (depend on the history of the chain) \\
-%pseudo-marginal (MC estimate the target) \\
-%austere MCMC \\
-%(MC$)^3$ (something parallel) \\
-%coupling from the past (perfect estimators) \\
-%Langevin dynamics (cross between SGD and MCMC) \\
-%online MCMC (there seems to be one attempt at this)
-
 \bigskip
 
 In the rest of this thesis, we focus on accelerating MCMC by combining
@@ -1023,7 +965,5 @@ parallelism with approximations to the transition operator through
 prefetching ideas.
 Notably, we arrive at a method in which the stationary distribution is 
 \emph{exactly} the target posterior.
-
-%We attack the problem using parallelism.
 
 \end{document}
