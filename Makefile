@@ -1,5 +1,5 @@
 main: angelino.pdf clean
-angelino.pdf: angelino.tex refs.bib files/*.tex latex_macros.tex # thesis.sty
+angelino.pdf: angelino.tex refs.bib files/*.tex latex_macros.tex thesis.sty
 	pdflatex angelino
 	pdflatex angelino
 	bibtex angelino
