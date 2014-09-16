@@ -17,9 +17,10 @@ References
 
 [Fetching][2] is the associated implementation.	
 
-[Accelerating MCMC via parallel predictive prefetching][3]
-Elaine Angelino, Eddie Kohler, Amos Waterland, Margo Seltzer, Ryan P. Adams
+[Accelerating MCMC via parallel predictive prefetching][3].
+Elaine Angelino, Eddie Kohler, Amos Waterland, Margo Seltzer, Ryan P. Adams.
 UAI 2014: 30th Conference on Uncertainty in Artificial Intelligence
+
 
 [1]: http://www.eecs.harvard.edu/~elaine/draft.pdf
 [2]: https://github.com/elaine84/fetching
