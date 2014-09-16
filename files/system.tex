@@ -524,6 +524,15 @@ containing~${\rho, \theta_\rho}$ and~$\log\pi_0(\theta_\rho)$.
 The master stores the information from this message in the jobtree, \ie it 
 stores~$\theta_\rho$ and, if relevant,~$\log \pi_0(\theta_\rho)$ at node~$\rho$.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.49\textwidth]{figs/protocol/partial-work.pdf}
+\caption{Scenario in which a worker receives a partial \HAVEWORK message
+for node~$\rho$ that already contains the state~$\theta_\rho$,
+and potentially, additional partial results.}
+\label{fig:partial-work}
+\end{figure}
+
 Alternately, the \HAVEWORK message already contains the proposal,
 and potentially, additional partial results; this scenario is depicted in Figure~\ref{fig:partial-work}.
 %
@@ -547,14 +556,6 @@ In our implementation, the worker makes these checks after each completed batch.
 After the worker sends the last \UPDATE message for the last batch,
 it sends the master a \WANTWORK message.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.49\textwidth]{figs/protocol/partial-work.pdf}
-\caption{Scenario in which a worker receives a partial \HAVEWORK message
-for node~$\rho$ that already contains the state~$\theta_\rho$,
-and potentially, additional partial results.}
-\label{fig:partial-work}
-\end{figure}
 
 \begin{figure}[t]
 \centering
