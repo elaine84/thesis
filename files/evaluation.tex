@@ -231,7 +231,7 @@ and decrease it if the acceptance rate is too low.
 Our adaptive rule achieves this by modifying~${\ell = \log{\lambda^2}}$,
 the log of the variance, as follows:
 \[
-\ell_{t+1} = \gamma_{t+1} (\one_\rho - 0.234).
+\ell_{t+1} = \ell_t + \gamma_{t+1} (\one_\rho - 0.234).
 \]
 We set~${\ell_0 = \log(2.38^2 / d)}$, which corresponds to the proposal
 distribution with the ``optimal'' acceptance rate of~0.234, derived
