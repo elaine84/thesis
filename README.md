@@ -13,13 +13,11 @@ Margo Seltzer, Ryan P. Adams, Eddie Kohler
 References
 ----------
 
-[Accelerating Markov chain Monte Carlo via parallel predictive prefetching][1], Elaine Angelino, PhD thesis, School of Engineering and Applied Sciences, Harvard University, 2014.
+Elaine Angelino. [Accelerating Markov chain Monte Carlo via parallel predictive prefetching][1]. PhD thesis, School of Engineering and Applied Sciences, Harvard University, 2014.
 
 [Fetching][2] is the associated implementation.	
 
-[Accelerating MCMC via parallel predictive prefetching][3].
-Elaine Angelino, Eddie Kohler, Amos Waterland, Margo Seltzer, Ryan P. Adams.
-UAI 2014: 30th Conference on Uncertainty in Artificial Intelligence
+Elaine Angelino, Eddie Kohler, Amos Waterland, Margo Seltzer, Ryan P. Adams. [Accelerating MCMC via parallel predictive prefetching][3]. In *30th Conference on Uncertainty in Artificial Intelligence*, UAI ’14, 2014.
 
 
 [1]: http://www.eecs.harvard.edu/~elaine/draft.pdf
