@@ -1,0 +1,284 @@
+%====================== Page Layout
+%\textwidth 5.00in
+%\textheight  7.3in
+\oddsidemargin 36pt   \evensidemargin 18pt 
+\textwidth 414pt  % per Alice's 33 picas = 33/6 in
+\topmargin  5pt      \headheight 13.5pt        \headsep  13.5pt
+\textheight  8in
+\footskip 27pt  \parskip  0ex 
+\marginparwidth 1in
+%\marginparsep 1in
+\marginparsep .25in
+
+%===================== Float placement parameters
+\renewcommand{\topfraction}{.9}
+\renewcommand{\bottomfraction}{.9}
+\renewcommand{\textfraction}{.05}
+%\renewcommand{\floatpagefraction}{.05}
+\renewcommand{\floatpagefraction}{.5} % ACS
+
+%====================== Define special fonts
+\newfont{\BIG}{cminch}                             %--- One-inch font
+\newfont{\sfbHuge}{cmssbx10 scaled\magstep5}       %-- 25pt sans serif bold
+\newfont{\sfblarge}{cmssbx10 scaled\magstep1}      %-- 12pt sans serif bold
+\newfont{\sfbeleven}{cmssbx10 scaled\magstephalf}  %-- 11pt sans serif bold
+\newfont{\sfb}{cmssbx10}                           %-- 10pt sans serif bold
+\newfont{\sfeight}{cmss8}                          %-- 8pt sans serif
+
+
+%===================== LaTeX and TeX type logos
+\newcount\TestCount
+\def\La{\TestCount=\the\fam \leavevmode L\raise.42ex
+         \hbox{$\fam\TestCount\scriptstyle\kern-.3em A$}}
+\def\LaTeX{\La\kern-.15em\TeX}
+\def\AllTeX{{(\La)\TeX}}
+
+
+
+% %===================== Redefine the \@makecaption command
+%    \long\def\@makecaption#1#2{\vskip 10\p@
+% %% \setbox\@tempboxa\hbox{#1: #2}%         %% original label definition
+% %%   \setbox\@tempboxa\hbox{{\bf #1.} #2}%   %% bold and . instead of :
+%    \setbox\@tempboxa\hbox{{\bf\footnotesize #1.} \footnotesize #2}%   %% ACS added \footnotesize
+%    \ifdim \wd\@tempboxa >\hsize
+% %%     #1: #2\par                   %% original definition
+% %%       {\bf #1.} #2\par             %% bold and . instead of :
+%        {\bf\footnotesize #1.} \footnotesize #2\par             %% ACS ditto
+%    \else
+%     \hbox to\hsize{\hfil\box\@tempboxa\hfil}%   %% original
+% %%      \hbox to\hsize{\box\@tempboxa\hfil}%             %% no centering
+%    \fi}
+
+% %===================== New caption macro
+% \newlength{\captsize}         \let\captsize=\footnotesize
+% \newlength{\captwidth}        \setlength{\captwidth}{\textwidth}
+% \newlength{\beforetableskip}  \setlength{\beforetableskip}{.5\baselineskip}
+% \newcommand{\capt}[1]{\begin{minipage}{\captwidth}
+%           \let\normalsize=\captsize
+%           \caption[#1]{#1} 
+%           \end{minipage}\\ \vspace{\beforetableskip}}
+
+%---------- Change Figure Label
+% \newcommand{\thefigurename}{Figure}   %-- set default: Figure
+% \def\fnum@figure{\thefigurename\ \thefigure}
+
+
+%===================== New Environments
+
+%------ New environment for better spacing in Eqnarray
+\newenvironment{Eqnarray}{\arraycolsep 0.14em\begin{eqnarray}}{\end{eqnarray}}
+
+%------ Reference List Macro
+\newenvironment{reflist}{\begin{list}{}{\leftmargin 1em \labelwidth 0in
+\labelsep 0in \itemsep 0ex  \rightmargin 0in}}{\end{list}}
+\newcommand{\refitem}{\item \hspace*{-1em}}   %--- item for ref list
+\newcommand{\SC}{\scriptsize}  %--- small capitals for reference lists
+
+%------ Problem List Macro
+\newcounter{probnum}
+\newenvironment{exerlist}%
+  {\begin{list}{\bf \theprobnum.}%
+  {\usecounter{probnum} \itemsep 1ex  \leftmargin 2.0em \labelsep 0.5em
+   \rightmargin 0in}}{\end{list}}
+
+
+
+
+%===================== Define FANCYHDS.STY
+% fancyheadings.sty version 1.1
+% Fancy headers and footers.
+% Piet van Oostrum, Dept of Computer Science, University of Utrecht
+% Padualaan 14, P.O. Box 80.089, 3508 TB Utrecht, The Netherlands
+% Telephone: +31-30-531806. piet@cs.ruu.nl (mcvax!hp4nl!ruuinf!piet)
+% Sep 23, 1992.
+
+\def\lhead{\@ifnextchar[{\@xlhead}{\@ylhead}}
+\def\@xlhead[#1]#2{\gdef\@elhead{#1}\gdef\@olhead{#2}}
+\def\@ylhead#1{\gdef\@elhead{#1}\gdef\@olhead{#1}}
+
+\def\chead{\@ifnextchar[{\@xchead}{\@ychead}}
+\def\@xchead[#1]#2{\gdef\@echead{#1}\gdef\@ochead{#2}}
+\def\@ychead#1{\gdef\@echead{#1}\gdef\@ochead{#1}}
+
+\def\rhead{\@ifnextchar[{\@xrhead}{\@yrhead}}
+\def\@xrhead[#1]#2{\gdef\@erhead{#1}\gdef\@orhead{#2}}
+\def\@yrhead#1{\gdef\@erhead{#1}\gdef\@orhead{#1}}
+
+\def\lfoot{\@ifnextchar[{\@xlfoot}{\@ylfoot}}
+\def\@xlfoot[#1]#2{\gdef\@elfoot{#1}\gdef\@olfoot{#2}}
+\def\@ylfoot#1{\gdef\@elfoot{#1}\gdef\@olfoot{#1}}
+
+\def\cfoot{\@ifnextchar[{\@xcfoot}{\@ycfoot}}
+\def\@xcfoot[#1]#2{\gdef\@ecfoot{#1}\gdef\@ocfoot{#2}}
+\def\@ycfoot#1{\gdef\@ecfoot{#1}\gdef\@ocfoot{#1}}
+
+\def\rfoot{\@ifnextchar[{\@xrfoot}{\@yrfoot}}
+\def\@xrfoot[#1]#2{\gdef\@erfoot{#1}\gdef\@orfoot{#2}}
+\def\@yrfoot#1{\gdef\@erfoot{#1}\gdef\@orfoot{#1}}
+
+\newdimen\headrulewidth
+\newdimen\footrulewidth
+\newdimen\plainheadrulewidth
+\newdimen\plainfootrulewidth
+\newdimen\headwidth
+\newif\if@fancyplain \@fancyplainfalse
+\def\fancyplain#1#2{\if@fancyplain#1\else#2\fi}
+
+% Initialization of the head and foot text.
+
+\headrulewidth 0.4pt
+\footrulewidth\z@
+\plainheadrulewidth\z@
+\plainfootrulewidth\z@
+
+\lhead[\fancyplain{}{\sl\rightmark}]{\fancyplain{}{\sl\leftmark}}
+%  i.e. empty on ``plain'' pages \rightmark on even, \leftmark on odd pages
+\chead{}
+\rhead[\fancyplain{}{\sl\leftmark}]{\fancyplain{}{\sl\rightmark}}
+%  i.e. empty on ``plain'' pages \leftmark on even, \rightmark on odd pages
+\lfoot{}
+\cfoot{\rm\thepage} % page number
+\rfoot{}
+
+% Put together a header or footer given the left, center and
+% right text, fillers at left and right and a rule.
+% The \lap commands put the text into an hbox of zero size,
+% so overlapping text does not generate an errormessage.
+
+\def\@fancyhead#1#2#3#4#5{#1\hbox to\headwidth{\vbox{\hbox
+{\rlap{\parbox[b]{\headwidth}{\raggedright#2\strut}}\hfill
+\parbox[b]{\headwidth}{\centering#3\strut}\hfill
+\llap{\parbox[b]{\headwidth}{\raggedleft#4\strut}}}\headrule}}#5}
+
+
+\def\@fancyfoot#1#2#3#4#5{#1\hbox to\headwidth{\vbox{\footrule
+\hbox{\rlap{\parbox[t]{\headwidth}{\raggedright#2\strut}}\hfill
+\parbox[t]{\headwidth}{\centering#3\strut}\hfill
+\llap{\parbox[t]{\headwidth}{\raggedleft#4\strut}}}}}#5}
+
+% not the correct correction
+\def\@fancyfoot#1#2#3#4#5{\hfill \thepage \hfill}
+
+\def\headrule{{\if@fancyplain\headrulewidth\plainheadrulewidth\fi
+\hrule\@height\headrulewidth\@width\headwidth \vskip-\headrulewidth}}
+
+\def\footrule{{\if@fancyplain\footrulewidth\plainfootrulewidth\fi
+\vskip-0.3\normalbaselineskip\vskip-\footrulewidth
+\hrule\@width\headwidth\@height\footrulewidth\vskip0.3\normalbaselineskip}}
+
+\def\ps@fancy{
+\let\@mkboth\markboth
+\@ifundefined{chapter}{\def\sectionmark##1{\markboth
+{\uppercase{\ifnum \c@secnumdepth>\z@
+ \thesection\hskip 1em\relax \fi ##1}}{}}
+\def\subsectionmark##1{\markright {\ifnum \c@secnumdepth >\@ne
+ \thesubsection\hskip 1em\relax \fi ##1}}}
+{\def\chaptermark##1{\markboth {\uppercase{\ifnum \c@secnumdepth>\m@ne
+ \@chapapp\ \thechapter. \ \fi ##1}}{}}
+\def\sectionmark##1{\markright{\uppercase{\ifnum \c@secnumdepth >\z@
+ \thesection. \ \fi ##1}}}}
+\ps@@fancy
+\headwidth\textwidth}
+\def\ps@fancyplain{\ps@fancy \let\ps@plain\ps@plain@fancy}
+\def\ps@plain@fancy{\@fancyplaintrue\ps@@fancy}
+\def\ps@@fancy{
+\def\@oddhead{\@fancyhead\relax\@olhead\@ochead\@orhead\hss}
+\def\@oddfoot{\@fancyfoot\relax\@olfoot\@ocfoot\@orfoot\relax}
+\def\@evenhead{\@fancyhead\hss\@elhead\@echead\@erhead\relax}
+\def\@evenfoot{\@fancyfoot\relax\@elfoot\@ecfoot\@erfoot\relax}
+}
+%------------------- Modify Headers
+%---------- Set up headers and footers
+\pagestyle{fancyplain}
+\plainfootrulewidth 0pt             %---- no foot rule for chapter page
+\footrulewidth 0pt                  %---- no rule for foot
+%--- Redefine Headers
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+%\rhead[\fancyplain{}{\footnotesize\sf\CHHEAD}]{\fancyplain{}{\bf\thepage}}
+%\rhead[\fancyplain{}{\sfeight\CHHEAD}]{\fancyplain{}{\bf\thepage}}
+%\rhead[\fancyplain{}{\sfeight\leftmark}]{\fancyplain{}{\bf\thepage}}
+%\lhead[\fancyplain{}{\bf\thepage}]{\fancyplain{}{\sfeight\rightmark}}
+
+%%      ACS Chapter on right, book title on left per alice...
+%\lhead[\fancyplain{}{\bf\thepage}]{\fancyplain{}{\sfeight\leftmark}} %ACS
+%\rhead[\fancyplain{}{\sfeight\cesstitle}]{\fancyplain{}{\bf\thepage}} %ACS
+%%      ACS Chapter on left, Section on right 
+\lhead[\fancyplain{}{}]{\fancyplain{}{\sfeight\rightmark}} %ACS
+\rhead[\fancyplain{}{\sfeight\leftmark}]{\fancyplain{}{}} %ACS
+
+
+%--- Empty footers on every page (except initial chapter page which has
+%--- page number) and optionally a small date stamp
+\cfoot[\fancyplain{\thepage}{\thepage}]{\fancyplain{\thepage}{\thepage}}
+
+\rfoot[\fancyplain{}{}]{\fancyplain{}{}}
+\lfoot[\fancyplain{}{}]{\fancyplain{}{}}
+
+% \lhead[\fancyplain{}{\bf\thepage}]{\fancyplain{}{\sfeight\rightmark}}
+% \rhead[\fancyplain{}{\sfeight\leftmark}]{\fancyplain{}{\bf\thepage}}
+%-- replace the two lines above with the two below for a date stamp footer
+%\rfoot[\fancyplain{\scriptsize \today}{\scriptsize \today}]{\fancyplain{\bf\the page}{}}
+%\lfoot[\fancyplain{\bf\thepage}{}]{\fancyplain{\scriptsize \today}{\scriptsiz \today}}
+%--- Change format of section header
+\def\sectionmark#1{\markright{\ifnum \c@secnumdepth >\z@
+  {\sfeight Sec.\ }\thesection. \ \fi #1}}
+
+
+%===================== Change Section Heads to Bold Sans Serif
+% Create bolds sans serif sectioning headings.  Also the headings have
+% been reduced in size with less space before and after the heading.
+% Modified from macros given in BK10.STY
+%
+%----------------------------- part ---------------------------------
+% no changes made to part
+
+%------------------------- chapter -----------------------------------
+\def\@makechapterhead#1{ \vspace*{-20pt}  { \parindent 0pt \raggedright
+ \ifnum \c@secnumdepth >\m@ne \LARGE\sf \@chapapp{} \thechapter \par
+ \vskip 3pt \hrule % \vskip 3pt \hrule
+ \vskip 30pt \fi \raggedleft \Huge \sfbHuge #1\par
+ \nobreak \vskip 70pt } }
+
+\def\@makeschapterhead#1{ \vspace*{4pt} { \parindent 0pt
+ \vskip 3pt \hrule % \vskip 3pt \hrule
+ \vskip 36pt \raggedleft \Huge \sfbHuge #1\par
+ \nobreak \vskip 70pt } }
+%------------------------ section -----------------------------------
+\def\section{\@startsection {section}{1}{\z@}{-3.5ex plus -1ex
+    minus -.2ex}{1.8ex}{\large\sfblarge}}
+
+%--------------------- subsection -----------------------------------
+\def\subsection{\@startsection{subsection}{2}{\z@}{-2.75ex plus -1ex
+    minus -.2ex}{1.2ex}{\large\sfblarge}}
+
+%-------------------- subsubsection --------------------------------
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-2.75ex
+     plus -1ex minus -.2ex}{1.2ex}{\normalsize\sfb}}
+
+%----------------------- paragraph ----------------------------------
+\def\paragraph{\@startsection{paragraph}{4}{\z@}{1.25ex plus
+     1ex minus .2ex}{-1em}{\normalsize\sfb}}
+%
+%---------------------- subparagraph --------------------------------
+\def\subparagraph{\@startsection{subparagraph}{4}{\parindent}{1.25ex
+     plus 1ex minus .2ex}{-1em}{\normalsize\sfb}}
+
+%====================== Turn off leader dots in Table of Contents
+%\renewcommand{\@dotsep}{500}  % turned back on ACS
+
+%=============== Place a black square to the left of exercise number ACS
+
+% new phcess bullet
+%\newcommand{\newbullet}{\rule{2.75pt}{8.25pt}%
+%  \rule{2.75pt}{2.75pt}\kern-2.75pt%
+%  \rule[5.5pt]{2.75pt}{2.75pt}%
+%  \rule{2.75pt}{8.25pt}}
+%\makeatletter
+%\renewcommand{\@seccntformat}[1]{{\protect\newbullet} \csname
+%the#1\endcsname\hspace{0.5em}} 
+%\makeatother
+
+\makeatletter
+\renewcommand{\@seccntformat}[1]{{$\blacksquare$} \csname
+the#1\endcsname\hspace{0.5em}} 
+\makeatother
